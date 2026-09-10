@@ -33,10 +33,12 @@ export default function ControlPanel() {
       <Toggle
         label="Show Argo Floats"
         storeKey="showFloats"
+        tip="Toggle the floating Argo observation markers on the ocean surface"
       />
       <Toggle
         label="Compare Model vs Observation"
         storeKey="compareModel"
+        tip="Overlay simulated model profiles (dashed) against real float observations (solid)"
       />
 
       <FloatInfoCard />

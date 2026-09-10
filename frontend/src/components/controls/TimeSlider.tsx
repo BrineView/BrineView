@@ -1,5 +1,6 @@
 import { useOceanStore } from "../../state/useOceanStore";
 import { formatTime } from "../../lib/format";
+import ControlTooltip from "../ControlTooltip";
 
 export default function TimeSlider() {
   const meta = useOceanStore((s) => s.meta);
@@ -10,28 +11,30 @@ export default function TimeSlider() {
   const currentTime = times[timeIndex] ?? "";
 
   return (
-    <div>
-      <label className="block text-xs mb-1" style={{ color: "var(--text-muted)" }}>
-        Time
-      </label>
-      <input
-        type="range"
-        min={0}
-        max={Math.max(0, times.length - 1)}
-        step={1}
-        value={timeIndex}
-        onChange={(e) => setTimeIndex(Number(e.target.value))}
-        disabled={!meta}
-        className="w-full"
-      />
-      <div className="flex justify-between text-xs mt-1">
-        <span style={{ color: "var(--text-primary)" }}>
-          Step {timeIndex + 1}/{times.length}
-        </span>
-        <span style={{ color: "var(--text-muted)" }}>
-          {formatTime(currentTime)}
-        </span>
+    <ControlTooltip tip="Step through 8 time intervals to see how ocean conditions change through the day">
+      <div>
+        <label className="block text-xs mb-1" style={{ color: "var(--text-muted)" }}>
+          Time
+        </label>
+        <input
+          type="range"
+          min={0}
+          max={Math.max(0, times.length - 1)}
+          step={1}
+          value={timeIndex}
+          onChange={(e) => setTimeIndex(Number(e.target.value))}
+          disabled={!meta}
+          className="w-full"
+        />
+        <div className="flex justify-between text-xs mt-1">
+          <span style={{ color: "var(--text-primary)" }}>
+            Step {timeIndex + 1}/{times.length}
+          </span>
+          <span style={{ color: "var(--text-muted)" }}>
+            {formatTime(currentTime)}
+          </span>
+        </div>
       </div>
-    </div>
+    </ControlTooltip>
   );
 }

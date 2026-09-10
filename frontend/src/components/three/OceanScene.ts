@@ -19,6 +19,12 @@ export class OceanScene {
   private controls: OrbitControls;
   private surfaceMesh: THREE.Mesh | null = null;
   private markerGroup: THREE.Group;
+
+  // Depth-layer stack (translucent planes below the surface)
+  private oceanGroup: THREE.Group;
+  private depthLayers: { mesh: THREE.Mesh; nominalDepth: number; baseOpacity: number }[] = [];
+  private currentDepth = 0;
+
   private raycaster = new THREE.Raycaster();
   private pointer = new THREE.Vector2();
   private animFrameId = 0;
@@ -54,7 +60,19 @@ export class OceanScene {
 
     // Scene
     this.scene = new THREE.Scene();
-    this.scene.fog = new THREE.Fog(0x0b1220, 60, 120);
+    this.scene.fog = new THREE.FogExp2(0x050d1a, 0.0065);
+
+    // Lighting — soft ambient + a cool directional key light
+    const ambientLight = new THREE.AmbientLight(0x9fc7e8, 0.95);
+    this.scene.add(ambientLight);
+
+    const dirLight = new THREE.DirectionalLight(0xcfe8ff, 0.6);
+    dirLight.position.set(14, 40, 18);
+    this.scene.add(dirLight);
+
+    const backLight = new THREE.DirectionalLight(0x0a76b8, 0.3);
+    backLight.position.set(-18, 10, -24);
+    this.scene.add(backLight);
 
     // Camera
     const aspect = canvasContainer.clientWidth / canvasContainer.clientHeight;
@@ -71,14 +89,21 @@ export class OceanScene {
     this.controls.maxDistance = 120;
     this.controls.target.set(0, 0, 0);
 
+    // Ocean group — everything water-related moves together (gentle heave)
+    this.oceanGroup = new THREE.Group();
+    this.scene.add(this.oceanGroup);
+
     // Marker group
     this.markerGroup = new THREE.Group();
-    this.scene.add(this.markerGroup);
+    this.oceanGroup.add(this.markerGroup);
 
-    // Add grid helper (subtle)
+    // Translucent depth layers below the surface
+    this.createDepthLayers();
+
+    // Add grid helper (subtle) at the bottom of the water column
     const gridHelper = new THREE.GridHelper(WORLD_X_SPAN, 20, 0x1e293b, 0x111827);
-    gridHelper.position.y = -0.1;
-    this.scene.add(gridHelper);
+    gridHelper.position.y = -35;
+    this.oceanGroup.add(gridHelper);
 
     // Events
     this.renderer.domElement.addEventListener("pointermove", this.handlePointerMove);
@@ -87,6 +112,60 @@ export class OceanScene {
 
     // Start animation loop
     this.animate();
+  }
+
+  /**
+   * Build a stack of translucent horizontal planes below the surface.
+   * Each plane represents an ocean depth band; deeper bands are darker,
+   * more transparent, and spaced on a log-ish curve to mimic real depth.
+   */
+  private createDepthLayers() {
+    type LayerDef = { y: number; nominalDepth: number; opacity: number; color: number };
+    const layers: LayerDef[] = [
+      { y: -3, nominalDepth: 10, opacity: 0.28, color: 0x1788d0 },
+      { y: -8, nominalDepth: 50, opacity: 0.23, color: 0x1168b0 },
+      { y: -14, nominalDepth: 150, opacity: 0.19, color: 0x0c4e94 },
+      { y: -21, nominalDepth: 400, opacity: 0.15, color: 0x083877 },
+      { y: -28, nominalDepth: 750, opacity: 0.11, color: 0x052457 },
+      { y: -34, nominalDepth: 1000, opacity: 0.08, color: 0x03143a },
+    ];
+
+    const geom = new THREE.PlaneGeometry(WORLD_X_SPAN, WORLD_Z_SPAN);
+
+    for (const l of layers) {
+      const mat = new THREE.MeshPhongMaterial({
+        color: l.color,
+        transparent: true,
+        opacity: l.opacity,
+        side: THREE.DoubleSide,
+        shininess: 20,
+        specular: 0x112233,
+      });
+      const mesh = new THREE.Mesh(geom, mat);
+      mesh.rotation.x = -Math.PI / 2;
+      mesh.position.y = l.y;
+      this.oceanGroup.add(mesh);
+      this.depthLayers.push({ mesh, nominalDepth: l.nominalDepth, baseOpacity: l.opacity });
+    }
+  }
+
+  /**
+   * Sync layer visibility with the currently selected depth.
+   * Layers closest to the selected depth brighten; distant ones fade,
+   * giving a "you are here" depth cue through the water column.
+   */
+  setActiveDepth(depthMeters: number) {
+    this.currentDepth = depthMeters;
+    const logSel = Math.log(depthMeters + 1);
+
+    for (const layer of this.depthLayers) {
+      const logLayer = Math.log(layer.nominalDepth + 1);
+      const d = Math.abs(logSel - logLayer);
+      // Gaussian falloff in log-depth space
+      const proximity = Math.exp(-(d * d) / (2 * 0.9 * 0.9));
+      const newOpacity = layer.baseOpacity * (0.18 + 0.82 * proximity);
+      (layer.mesh.material as THREE.MeshPhongMaterial).opacity = newOpacity;
+    }
   }
 
   setField(field: FieldResponse, colorscale: string) {
@@ -100,7 +179,7 @@ export class OceanScene {
 
     // Remove old mesh
     if (this.surfaceMesh) {
-      this.scene.remove(this.surfaceMesh);
+      this.oceanGroup.remove(this.surfaceMesh);
       this.surfaceMesh.geometry.dispose();
       (this.surfaceMesh.material as THREE.Material).dispose();
       this.surfaceMesh = null;
@@ -158,21 +237,26 @@ export class OceanScene {
     geom.setIndex(indices);
     geom.computeVertexNormals();
 
-    const material = new THREE.MeshBasicMaterial({
+    const material = new THREE.MeshPhongMaterial({
       map: texture,
       transparent: true,
       opacity: this.currentOpacity,
       side: THREE.DoubleSide,
+      emissive: 0x0a1726,
+      emissiveIntensity: 0.25,
+      shininess: 12,
+      specular: 0x112233,
     });
 
     this.surfaceMesh = new THREE.Mesh(geom, material);
-    this.scene.add(this.surfaceMesh);
+    this.oceanGroup.add(this.surfaceMesh);
+    this.setActiveDepth(this.currentDepth);
   }
 
   setOpacity(opacity: number) {
     this.currentOpacity = opacity;
     if (this.surfaceMesh) {
-      (this.surfaceMesh.material as THREE.MeshBasicMaterial).opacity = opacity;
+      (this.surfaceMesh.material as THREE.MeshPhongMaterial).opacity = opacity;
     }
   }
 
@@ -282,6 +366,12 @@ export class OceanScene {
     if (this.disposed) return;
     this.animFrameId = requestAnimationFrame(this.animate);
     this.controls.update();
+
+    // Gentle swell heave — simulates living ocean motion (does not fight OrbitControls)
+    const t = performance.now() * 0.00035;
+    this.oceanGroup.position.y = Math.sin(t) * 0.3;
+    this.oceanGroup.rotation.z = Math.sin(t * 0.6) * 0.003;
+
     this.renderer.render(this.scene, this.camera);
   };
 
@@ -292,6 +382,14 @@ export class OceanScene {
     this.renderer.domElement.removeEventListener("pointerdown", this.handlePointerDown);
     this.renderer.domElement.removeEventListener("pointerup", this.handlePointerUp);
     this.controls.dispose();
+
+    // Dispose depth-layer geometry & materials
+    for (const layer of this.depthLayers) {
+      layer.mesh.geometry.dispose();
+      (layer.mesh.material as THREE.Material).dispose();
+    }
+    this.depthLayers = [];
+
     this.renderer.dispose();
     if (this.renderer.domElement.parentNode) {
       this.renderer.domElement.parentNode.removeChild(this.renderer.domElement);

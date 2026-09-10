@@ -1,0 +1,1 @@
+# BrineView auth package — JWT, password hashing, user storage, OAuth.

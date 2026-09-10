@@ -8,3 +8,4 @@ __pycache__/
 *.env
 *.egg-info/
 SIH2026-Brineview.pptx
+backend/data/users.json

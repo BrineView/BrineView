@@ -78,6 +78,11 @@ export default function OceanViewport() {
     sceneRef.current?.setOpacity(opacity);
   }, [opacity]);
 
+  // Update depth-layer visibility based on selected depth
+  useEffect(() => {
+    sceneRef.current?.setActiveDepth(depth);
+  }, [depth]);
+
   // Update floats
   useEffect(() => {
     sceneRef.current?.setFloats(floats);
