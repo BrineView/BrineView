@@ -1,0 +1,10 @@
+node_modules/
+frontend/dist/
+frontend/*.tsbuildinfo
+backend/.venv/
+__pycache__/
+*.pyc
+.env
+*.env
+*.egg-info/
+SIH2026-Brineview.pptx
