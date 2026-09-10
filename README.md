@@ -6,7 +6,7 @@ Browser-native 3D workspace for Indian Ocean model fields (temperature, salinity
 
 ---
 
-## Run it (demo day — exactly two commands)
+## Run it 
 
 ### Terminal 1 — Backend
 
