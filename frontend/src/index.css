@@ -1,13 +1,23 @@
 @import "tailwindcss";
 
 :root {
-  --ocean-bg: #0b1220;
-  --panel-bg: #111827;
-  --panel-border: #1e293b;
+  /* Abyssal ocean palette */
+  --abyss: #03070f;
+  --ocean-bg: #050d1a;
+  --deep-sea: #0a1f3d;
+  --open-sea: #0d3057;
+  --panel-bg: #0f1a2c;
+  --panel-border: #1b2b44;
   --accent-cyan: #06b6d4;
+  --biolum: #2de0c8;
   --accent-orange: #f97316;
-  --text-primary: #f1f5f9;
-  --text-muted: #94a3b8;
+  --text-primary: #edf6ff;
+  --text-muted: #8aa6c9;
+
+  /* Instrument type scale */
+  --font-display: "Chakra Petch", system-ui, sans-serif;
+  --font-body: system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-data: "IBM Plex Mono", ui-monospace, "SF Mono", monospace;
 }
 
 * {
@@ -19,11 +29,7 @@ body {
   padding: 0;
   background: var(--ocean-bg);
   color: var(--text-primary);
-  font-family:
-    system-ui,
-    -apple-system,
-    "Segoe UI",
-    sans-serif;
+  font-family: var(--font-body);
   overflow-x: hidden;
   overflow-y: auto;
 }
@@ -31,6 +37,42 @@ body {
 #root {
   width: 100vw;
   min-height: 100vh;
+}
+
+::selection {
+  background: rgba(45, 224, 200, 0.3);
+}
+
+:focus-visible {
+  outline: 2px solid var(--biolum);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Instrument type helpers */
+.font-display {
+  font-family: var(--font-display);
+}
+
+.font-data {
+  font-family: var(--font-data);
+}
+
+.eyebrow {
+  font-family: var(--font-data);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: var(--text-muted);
 }
 
 /* Legend gradient bar */
@@ -46,7 +88,7 @@ input[type="range"] {
   appearance: none;
   height: 6px;
   border-radius: 3px;
-  background: #1e293b;
+  background: var(--panel-border);
   outline: none;
   width: 100%;
 }

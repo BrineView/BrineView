@@ -56,6 +56,32 @@ UA = "BrineView-SIH2026 (hackathon build script)"
 
 net_stats = {"gmrt": None, "argo_index": 0, "argo_profiles": 0, "argo_failures": 0}
 
+# CF-convention metadata (climatological & forecast v2.0 / CF-1.11 style)
+CF_VAR_ATTRS = {
+    "temperature": {"standard_name": "sea_water_temperature", "units": "degrees_C", "long_name": "Sea Water Temperature"},
+    "salinity": {"standard_name": "sea_water_salinity", "units": "psu", "long_name": "Sea Water Salinity"},
+    "u_current": {"standard_name": "eastward_sea_water_velocity", "units": "m s-1", "long_name": "Eastward Sea Water Velocity"},
+    "v_current": {"standard_name": "northward_sea_water_velocity", "units": "m s-1", "long_name": "Northward Sea Water Velocity"},
+    "chlorophyll": {"standard_name": "mass_concentration_of_chlorophyll_a_in_sea_water", "units": "mg m-3", "long_name": "Chlorophyll Concentration"},
+}
+CF_COORD_ATTRS = {
+    "time": {"standard_name": "time", "axis": "T"},
+    "depth": {"standard_name": "depth", "axis": "Z", "units": "m", "positive": "down"},
+    "lat": {"standard_name": "latitude", "axis": "Y", "units": "degrees_north"},
+    "lon": {"standard_name": "longitude", "axis": "X", "units": "degrees_east"},
+}
+
+
+def apply_cf_attrs(ds: xr.Dataset, var_attrs: dict[str, dict], convention: str = "CF-1.11") -> None:
+    """Stamp CF-convention metadata onto a dataset in place."""
+    ds.attrs["Conventions"] = convention
+    for coord, attrs in CF_COORD_ATTRS.items():
+        if coord in ds.coords:
+            ds[coord].attrs.update(attrs)
+    for var, attrs in var_attrs.items():
+        if var in ds.data_vars:
+            ds[var].attrs.update(attrs)
+
 # ----------------------------------------------------------------------------
 # HTTP helpers
 # ----------------------------------------------------------------------------
@@ -153,6 +179,7 @@ def save_bathymetry() -> np.ndarray:
         dims=("lat", "lon"),
         coords={"lat": tgt_lat, "lon": tgt_lon},
         attrs={
+            "standard_name": "altitude",
             "units": "m",
             "long_name": "Bathymetry - elevation relative to mean sea level (-ve below sea)",
             "source": "GMRT (Global Multi-Resolution Topography), CC-BY 4.0",
@@ -161,6 +188,12 @@ def save_bathymetry() -> np.ndarray:
         },
     )
     ds = da.to_dataset(name="bathymetry")
+    apply_cf_attrs(ds, {"bathymetry": {
+        "standard_name": "altitude",
+        "units": "m",
+        "long_name": "Bathymetry - elevation relative to mean sea level (-ve below sea)",
+        "positive": "up",
+    }})
     ds.to_netcdf(
         OUT_DIR / "bathymetry.nc",
         encoding={"bathymetry": {"zlib": True, "complevel": 4}},
@@ -362,6 +395,11 @@ def build_fields(seafloor: np.ndarray) -> xr.Dataset:
         attrs={"region": REGION_NAME,
                "source": "analytic fields masked by GMRT bathymetry"},
     )
+    apply_cf_attrs(ds, CF_VAR_ATTRS)
+    ds.attrs["geospatial_lat_min"] = float(lat[0])
+    ds.attrs["geospatial_lat_max"] = float(lat[-1])
+    ds.attrs["geospatial_lon_min"] = float(lon[0])
+    ds.attrs["geospatial_lon_max"] = float(lon[-1])
     ds.to_netcdf(
         OUT_DIR / "ocean_demo.nc",
         encoding={v: {"zlib": True, "complevel": 2, "dtype": "float32"}

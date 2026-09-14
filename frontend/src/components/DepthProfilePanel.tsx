@@ -119,7 +119,7 @@ export default function DepthProfilePanel() {
     >
       <div className="flex items-center justify-between px-3 py-2 border-b"
         style={{ borderColor: "var(--panel-border)" }}>
-        <span className="text-sm font-semibold" style={{ color: "var(--accent-orange)" }}>
+        <span className="font-data text-sm font-semibold" style={{ color: "var(--accent-orange)" }}>
           {floatDetail?.id ?? "Profile"}
         </span>
         <button
@@ -140,12 +140,12 @@ export default function DepthProfilePanel() {
 
         {!floatDetailLoading && floatDetail && (
           <>
-            <div className="text-xs mb-2" style={{ color: "var(--text-muted)" }}>
-              Lat: {floatDetail.lat.toFixed(2)}° | Lon: {floatDetail.lon.toFixed(2)}°
+            <div className="font-data text-xs mb-2" style={{ color: "var(--text-muted)" }}>
+              Lat: {floatDetail.lat.toFixed(2)}° · Lon: {floatDetail.lon.toFixed(2)}°
             </div>
 
             {compareModel && (
-              <div className="text-[10px] mb-2 p-1.5 rounded" style={{ background: "#1e293b" }}>
+              <div className="font-data text-[10px] mb-2 p-1.5 rounded" style={{ background: "#16233a" }}>
                 <span style={{ color: "var(--text-muted)" }}>Solid = Observed | Dashed = Model</span>
               </div>
             )}

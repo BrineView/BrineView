@@ -4,6 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from .routes.api import router as api_router
 from .routes.auth import router as auth_router
+from .routes.upload import router as upload_router
 
 app = FastAPI(title="BrineView API", version="0.2.0", description="Interactive 3D Ocean Data Visualization")
 
@@ -20,6 +21,7 @@ app.add_middleware(
 
 app.include_router(api_router)
 app.include_router(auth_router)
+app.include_router(upload_router)
 
 
 @app.get("/")

@@ -4,6 +4,7 @@ import type {
   FloatDetail,
   FloatMeta,
   MetaResponse,
+  UserDatasetInfo,
 } from "../types/ocean";
 
 const BASE = "/api";
@@ -88,4 +89,45 @@ export function getBathymetry(): Promise<BathymetryResponse> {
 
 export function getFloatDetail(id: string): Promise<FloatDetail> {
   return fetchJson<FloatDetail>(`${BASE}/floats/${encodeURIComponent(id)}`);
+}
+
+export function listUserData(): Promise<UserDatasetInfo[]> {
+  return fetchJson<UserDatasetInfo[]>(`${BASE}/user-data`);
+}
+
+export async function uploadUserData(file: File): Promise<UserDatasetInfo> {
+  const fd = new FormData();
+  fd.append("file", file);
+  const res = await fetch(`${BASE}/user-data`, {
+    method: "POST",
+    body: fd,
+    signal: AbortSignal.timeout(TIMEOUT),
+  });
+  if (!res.ok) {
+    const body = await res.text().catch(() => "");
+    throw new Error(apiErrorMessage(res.status, body));
+  }
+  return res.json() as Promise<UserDatasetInfo>;
+}
+
+export function getUserDataField(params: {
+  index: number;
+  variable: string;
+  depth?: number;
+  timeIndex?: number;
+}): Promise<FieldResponse> {
+  const q = new URLSearchParams({
+    variable: params.variable,
+    depth: String(params.depth ?? 0),
+    time_index: String(params.timeIndex ?? 0),
+  });
+  return fetchJson<FieldResponse>(`${BASE}/user-data/${params.index}/field?${q}`);
+}
+
+export async function deleteUserData(index: number): Promise<void> {
+  const res = await fetch(`${BASE}/user-data/${index}`, { method: "DELETE" });
+  if (!res.ok) {
+    const body = await res.text().catch(() => "");
+    throw new Error(apiErrorMessage(res.status, body));
+  }
 }

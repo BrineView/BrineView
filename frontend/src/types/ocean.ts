@@ -58,3 +58,22 @@ export const VARIABLES: VariableInfo[] = [
 ];
 
 export const VARIABLE_MAP = Object.fromEntries(VARIABLES.map((v) => [v.name, v])) as Record<string, VariableInfo>;
+
+export interface UserVariableInfo {
+  name: string;
+  long_name: string;
+  standard_name: string;
+  units: string;
+  ndim: number;
+  shape: number[];
+  dims: string[];
+  has_lat_lon: boolean;
+}
+
+export interface UserDatasetInfo {
+  index: number;
+  name: string;
+  source: "netcdf" | "csv";
+  variables: UserVariableInfo[];
+  meta: MetaResponse;
+}

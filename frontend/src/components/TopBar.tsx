@@ -20,7 +20,7 @@ export default function TopBar() {
       <div className="flex items-center gap-3">
         <button
           onClick={() => setPage("landing")}
-          className="text-lg font-bold tracking-wide"
+          className="font-display text-lg font-bold tracking-wide"
           style={{
             color: "var(--accent-cyan)",
             background: "none",
@@ -31,16 +31,14 @@ export default function TopBar() {
         >
           BrineView
         </button>
-        <span className="text-sm" style={{ color: "var(--text-muted)" }}>
-          Andaman Sea · Sumatra Trench
-        </span>
+        <span className="eyebrow">Andaman Sea · Sumatra Trench</span>
       </div>
 
       <div className="flex items-center gap-4">
         {field && (
           <div
-            className="text-xs px-2 py-1 rounded"
-            style={{ background: "#1e293b" }}
+            className="font-data text-xs px-2 py-1 rounded"
+            style={{ background: "#1b2b44" }}
           >
             <span style={{ color: "var(--text-muted)" }}>Time: </span>
             <span style={{ color: "var(--text-primary)" }}>

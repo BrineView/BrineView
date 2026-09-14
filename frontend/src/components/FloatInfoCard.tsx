@@ -25,17 +25,17 @@ export default function FloatInfoCard() {
 
   return (
     <div
-      className="rounded p-2 text-xs"
-      style={{ background: "#1e293b" }}
+      className="font-data rounded p-2 text-xs"
+      style={{ background: "#16233a" }}
     >
       <div className="font-semibold mb-1" style={{ color: "var(--accent-orange)" }}>
         {floatDetail.id}
       </div>
       <div style={{ color: "var(--text-muted)" }}>
-        Lat: {formatNum(floatDetail.lat, 2)}° | Lon: {formatNum(floatDetail.lon, 2)}°
+        Lat: {formatNum(floatDetail.lat, 2)}° · Lon: {formatNum(floatDetail.lon, 2)}°
       </div>
       {compareModel && (
-        <div className="mt-1 pt-1" style={{ borderTop: "1px solid #334155" }}>
+        <div className="mt-1 pt-1" style={{ borderTop: "1px solid #1b2b44" }}>
           <div style={{ color: "var(--text-muted)" }}>Model vs Obs Δ</div>
           <div style={{ color: "var(--text-primary)" }}>
             Mean |ΔT|: {formatNum(meanDT, 3)} °C

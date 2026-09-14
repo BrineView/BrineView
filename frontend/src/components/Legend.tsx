@@ -11,15 +11,15 @@ export default function Legend() {
   const gradient = buildGradientCss(colorscale);
 
   return (
-    <div className="flex items-center gap-2 text-xs" style={{ minWidth: 200 }}>
-      <span style={{ color: "var(--text-muted)" }}>
+    <div className="flex items-center gap-2 text-xs font-data" style={{ minWidth: 200 }}>
+      <span style={{ color: "var(--text-muted)", whiteSpace: "nowrap" }}>
         {field?.min?.toFixed(1)} {info?.unit}
       </span>
       <div
         className="legend-gradient flex-1"
         style={{ background: gradient }}
       />
-      <span style={{ color: "var(--text-muted)" }}>
+      <span style={{ color: "var(--text-muted)", whiteSpace: "nowrap" }}>
         {field?.max?.toFixed(1)} {info?.unit}
       </span>
     </div>

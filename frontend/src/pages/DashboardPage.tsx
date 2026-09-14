@@ -4,6 +4,7 @@ import TopBar from "../components/TopBar";
 import ControlPanel from "../components/ControlPanel";
 import OceanViewport from "../components/three/OceanViewport";
 import DepthProfilePanel from "../components/DepthProfilePanel";
+import UserDataModal from "../components/UserDataModal";
 import Footer from "../components/Footer";
 
 export default function DashboardPage() {
@@ -37,6 +38,7 @@ export default function DashboardPage() {
           <DepthProfilePanel />
         </div>
       </div>
+      <UserDataModal />
       <Footer />
     </div>
   );

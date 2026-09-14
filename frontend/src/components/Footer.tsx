@@ -11,7 +11,7 @@ export default function Footer() {
 
   return (
     <footer
-      className="flex items-center justify-between px-4 py-1.5 text-[11px] border-t"
+      className="font-data flex items-center justify-between px-4 py-1.5 text-[11px] border-t"
       style={{
         background: "var(--panel-bg)",
         borderColor: "var(--panel-border)",

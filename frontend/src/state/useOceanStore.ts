@@ -5,6 +5,7 @@ import type {
   FloatDetail,
   FloatMeta,
   MetaResponse,
+  UserDatasetInfo,
 } from "../types/ocean";
 import type { AuthUser } from "../types/auth";
 import * as api from "../api/client";
@@ -73,6 +74,12 @@ interface OceanState {
   floatDetail: FloatDetail | null;
   floatDetailLoading: boolean;
 
+  // User-uploaded data state
+  userDatasets: UserDatasetInfo[];
+  userDataOpen: boolean;
+  userDataLoading: boolean;
+  userDataError: string | null;
+
   // Actions — routing & auth
   setPage: (page: PageId) => void;
   signupWithEmail: (name: string, email: string, password: string) => Promise<void>;
@@ -98,6 +105,11 @@ interface OceanState {
   loadField: (variable: string, depth: number, timeIndex: number) => Promise<void>;
   loadFloatDetail: (id: string) => Promise<void>;
   closeProfilePanel: () => void;
+  openUserData: () => Promise<void>;
+  closeUserData: () => void;
+  uploadUserData: (file: File) => Promise<void>;
+  deleteUserData: (index: number) => Promise<void>;
+  loadUserField: (index: number, variable: string) => Promise<void>;
 }
 
 function applyAuth(
@@ -135,6 +147,11 @@ export const useOceanStore = create<OceanState>((set, get) => ({
   floats: [],
   floatDetail: null,
   floatDetailLoading: false,
+
+  userDatasets: [],
+  userDataOpen: false,
+  userDataLoading: false,
+  userDataError: null,
 
   // Routing & auth actions
   setPage: (page) => set({ currentPage: page }),
@@ -270,4 +287,62 @@ export const useOceanStore = create<OceanState>((set, get) => ({
       selectedFloatId: null,
       floatDetail: null,
     }),
+
+  openUserData: async () => {
+    set({ userDataOpen: true, userDataError: null });
+    try {
+      const userDatasets = await api.listUserData();
+      set({ userDatasets });
+    } catch {
+      // list stays empty — the upload buttons still work
+    }
+  },
+
+  closeUserData: () =>
+    set({ userDataOpen: false, userDataError: null }),
+
+  uploadUserData: async (file) => {
+    set({ userDataLoading: true, userDataError: null });
+    try {
+      const uploaded = await api.uploadUserData(file);
+      set((s) => ({
+        userDatasets: [...s.userDatasets.filter((d) => d.index !== uploaded.index), uploaded],
+        userDataLoading: false,
+      }));
+    } catch (err) {
+      set({
+        userDataError: err instanceof Error ? err.message : "Upload failed",
+        userDataLoading: false,
+      });
+      throw err;
+    }
+  },
+
+  deleteUserData: async (index) => {
+    try {
+      await api.deleteUserData(index);
+      set((s) => ({ userDatasets: s.userDatasets.filter((d) => d.index !== index) }));
+    } catch {
+      // keep the entry; user can retry or close the modal
+    }
+  },
+
+  loadUserField: async (index, variable) => {
+    set({ fieldLoading: true, fieldError: null });
+    try {
+      const field = await api.getUserDataField({ index, variable });
+      const name = variable.toLowerCase();
+      let colorscale = get().colorscale;
+      if (name.includes("salinity")) colorscale = "viridis";
+      else if (name.includes("chlorophyll")) colorscale = "chlorophyll";
+      else if (name.includes("current") || name.includes("velocity")) colorscale = "rdbu";
+      else if (name.includes("temperature") || name.includes("temp")) colorscale = "thermal";
+      set({ field, variable, colorscale, fieldLoading: false, fieldError: null });
+    } catch (err) {
+      set({
+        fieldError: err instanceof Error ? err.message : "Failed to load data",
+        fieldLoading: false,
+      });
+    }
+  },
 }));
