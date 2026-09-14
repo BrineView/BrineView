@@ -10,7 +10,7 @@ export default function LoadingOverlay() {
           style={{ borderColor: "var(--accent-cyan)", borderTopColor: "transparent" }}
         />
         <span className="text-sm" style={{ color: "var(--text-muted)" }}>
-          Loading ocean data...
+          Loading ocean data…
         </span>
       </div>
     </div>

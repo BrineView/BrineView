@@ -43,7 +43,7 @@ export default function ControlPanel() {
 
       <button
         onClick={openUserData}
-        className="w-full px-3 py-2 rounded-lg text-sm font-medium transition-all hover:-translate-y-0.5"
+        className="w-full px-3 py-2 rounded-lg text-sm font-medium transition-transform hover:-translate-y-0.5"
         style={{
           background: "rgba(6, 182, 212, 0.1)",
           border: "1px dashed rgba(6, 182, 212, 0.4)",

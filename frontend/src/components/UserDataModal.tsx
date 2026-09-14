@@ -1,4 +1,4 @@
-import { useRef, type ChangeEvent } from "react";
+import { useEffect, useRef, useState, type ChangeEvent } from "react";
 import { useOceanStore } from "../state/useOceanStore";
 import type { UserDatasetInfo, UserVariableInfo } from "../types/ocean";
 
@@ -17,6 +17,16 @@ export default function UserDataModal() {
 
   const ncInputRef = useRef<HTMLInputElement>(null);
   const csvInputRef = useRef<HTMLInputElement>(null);
+  const [confirmRemove, setConfirmRemove] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") close();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [open, close]);
 
   if (!open) return null;
 
@@ -40,7 +50,7 @@ export default function UserDataModal() {
   const uploadButton = (label: string, hint: string, onPick: () => void) => (
     <button
       onClick={onPick}
-      className="flex-1 px-4 py-3 rounded-lg text-sm font-medium text-left transition-all hover:-translate-y-0.5"
+      className="flex-1 px-4 py-3 rounded-lg text-sm font-medium text-left transition-transform hover:-translate-y-0.5"
       style={{
         background: "rgba(6, 182, 212, 0.08)",
         border: "1px dashed rgba(6, 182, 212, 0.4)",
@@ -57,6 +67,9 @@ export default function UserDataModal() {
 
   return (
     <div
+      role="dialog"
+      aria-modal="true"
+      aria-label="Import your own data"
       className="fixed inset-0 z-50 flex items-center justify-center p-4"
       style={{ background: "rgba(5, 10, 20, 0.75)", backdropFilter: "blur(4px)" }}
       onMouseDown={(e) => {
@@ -90,14 +103,14 @@ export default function UserDataModal() {
               border: "none",
               cursor: "pointer",
             }}
-            title="Close"
+            aria-label="Close import dialog"
           >
             ×
           </button>
         </div>
 
         {/* Body */}
-        <div className="flex flex-col gap-4 p-5 overflow-y-auto" style={{ maxHeight: "62vh" }}>
+        <div className="flex flex-col gap-4 p-5 overflow-y-auto" style={{ maxHeight: "62vh", overscrollBehavior: "contain" }}>
           {/* Upload buttons */}
           <div className="flex gap-3">
             {uploadButton("NetCDF (.nc)", "Model output or gridded field", () => ncInputRef.current?.click())}
@@ -149,16 +162,24 @@ export default function UserDataModal() {
                     </span>
                   </div>
                   <button
-                    onClick={() => remove(d.index)}
+                    onClick={() => {
+                      if (confirmRemove === d.index) {
+                        setConfirmRemove(null);
+                        remove(d.index);
+                      } else {
+                        setConfirmRemove(d.index);
+                      }
+                    }}
                     className="text-[11px] px-2 py-0.5 rounded"
                     style={{
                       color: "#f87171",
-                      background: "rgba(248, 113, 113, 0.1)",
+                      background: confirmRemove === d.index ? "rgba(248, 113, 113, 0.28)" : "rgba(248, 113, 113, 0.1)",
                       border: "none",
                       cursor: "pointer",
                     }}
+                    aria-label={confirmRemove === d.index ? `Confirm removing ${d.name}` : `Remove ${d.name}`}
                   >
-                    Remove
+                    {confirmRemove === d.index ? "Confirm remove?" : "Remove"}
                   </button>
                 </div>
 
@@ -180,7 +201,7 @@ export default function UserDataModal() {
                       <button
                         onClick={() => preview(d, v)}
                         disabled={!v.has_lat_lon}
-                        className="px-3 py-1.5 rounded-md text-[11px] font-medium transition-all hover:-translate-y-0.5 shrink-0"
+                        className="px-3 py-1.5 rounded-md text-[11px] font-medium transition-transform hover:-translate-y-0.5 shrink-0"
                         style={{
                           background: v.has_lat_lon ? "var(--accent-cyan)" : "rgba(148, 163, 184, 0.15)",
                           color: v.has_lat_lon ? "#000" : "var(--text-muted)",

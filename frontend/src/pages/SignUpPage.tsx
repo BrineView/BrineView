@@ -5,7 +5,6 @@ import OAuthButtons from "../components/OAuthButtons";
 
 export default function SignUpPage() {
   const signupWithEmail = useOceanStore((s) => s.signupWithEmail);
-  const setPage = useOceanStore((s) => s.setPage);
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -52,7 +51,7 @@ export default function SignUpPage() {
   };
 
   return (
-    <div className="relative flex flex-col h-screen w-screen overflow-hidden ocean-bg-animated">
+    <main id="main" className="relative flex flex-col h-screen w-screen overflow-hidden ocean-bg-animated">
       <OceanBackground />
 
       <div className="relative z-10 flex flex-col items-center justify-center flex-1 px-6">
@@ -75,15 +74,18 @@ export default function SignUpPage() {
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             <div>
-              <label className="block text-xs mb-1" style={{ color: "var(--text-muted)" }}>
+              <label htmlFor="signup-name" className="block text-xs mb-1" style={{ color: "var(--text-muted)" }}>
                 Full name
               </label>
               <input
+                id="signup-name"
+                name="fullName"
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="Your name"
                 autoComplete="name"
+                spellCheck={false}
                 disabled={submitting}
                 className="w-full px-3 py-2 text-sm rounded-lg outline-none"
                 style={inputStyle}
@@ -93,15 +95,18 @@ export default function SignUpPage() {
             </div>
 
             <div>
-              <label className="block text-xs mb-1" style={{ color: "var(--text-muted)" }}>
+              <label htmlFor="signup-email" className="block text-xs mb-1" style={{ color: "var(--text-muted)" }}>
                 Email
               </label>
               <input
+                id="signup-email"
+                name="email"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="you@example.com"
                 autoComplete="email"
+                spellCheck={false}
                 disabled={submitting}
                 className="w-full px-3 py-2 text-sm rounded-lg outline-none"
                 style={inputStyle}
@@ -111,10 +116,12 @@ export default function SignUpPage() {
             </div>
 
             <div>
-              <label className="block text-xs mb-1" style={{ color: "var(--text-muted)" }}>
+              <label htmlFor="signup-password" className="block text-xs mb-1" style={{ color: "var(--text-muted)" }}>
                 Password
               </label>
               <input
+                id="signup-password"
+                name="password"
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -129,10 +136,12 @@ export default function SignUpPage() {
             </div>
 
             <div>
-              <label className="block text-xs mb-1" style={{ color: "var(--text-muted)" }}>
+              <label htmlFor="signup-confirm" className="block text-xs mb-1" style={{ color: "var(--text-muted)" }}>
                 Confirm password
               </label>
               <input
+                id="signup-confirm"
+                name="confirmPassword"
                 type="password"
                 value={confirm}
                 onChange={(e) => setConfirm(e.target.value)}
@@ -147,13 +156,13 @@ export default function SignUpPage() {
             </div>
 
             {error && (
-              <p className="text-xs" style={{ color: "#f87171" }}>{error}</p>
+              <p role="status" aria-live="polite" className="text-xs" style={{ color: "#f87171" }}>{error}</p>
             )}
 
             <button
               type="submit"
               disabled={submitting}
-              className="w-full py-2.5 rounded-lg text-sm font-semibold transition-all disabled:opacity-50"
+              className="w-full py-2.5 rounded-lg text-sm font-semibold transition-colors disabled:opacity-50"
               style={{
                 background: "var(--accent-cyan)",
                 color: "#000",
@@ -185,37 +194,32 @@ export default function SignUpPage() {
           <div className="mt-6 text-center">
             <p className="text-xs mb-2" style={{ color: "var(--text-muted)" }}>
               Already have an account?{" "}
-              <button
-                onClick={() => setPage("login")}
-                disabled={submitting}
+              <a
+                href="#/login"
                 className="transition-colors"
                 style={{
                   color: "var(--accent-cyan)",
-                  background: "none",
-                  border: "none",
-                  cursor: "pointer",
+                  textDecoration: "none",
                 }}
               >
                 Sign in
-              </button>
+              </a>
             </p>
-            <button
-              onClick={() => setPage("landing")}
+            <a
+              href="#/landing"
               className="text-xs transition-colors"
               style={{
                 color: "var(--text-muted)",
-                background: "none",
-                border: "none",
-                cursor: "pointer",
+                textDecoration: "none",
               }}
               onMouseEnter={(e) => { e.currentTarget.style.color = "var(--accent-cyan)"; }}
               onMouseLeave={(e) => { e.currentTarget.style.color = "var(--text-muted)"; }}
             >
               ← Back to home
-            </button>
+            </a>
           </div>
         </div>
       </div>
-    </div>
+    </main>
   );
 }

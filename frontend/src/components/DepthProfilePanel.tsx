@@ -126,6 +126,7 @@ export default function DepthProfilePanel() {
           onClick={closeProfilePanel}
           className="text-lg leading-none"
           style={{ color: "var(--text-muted)", background: "none", border: "none", cursor: "pointer" }}
+          aria-label="Close depth profile"
         >
           ×
         </button>

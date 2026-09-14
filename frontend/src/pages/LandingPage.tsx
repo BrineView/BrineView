@@ -2,11 +2,10 @@ import { useOceanStore } from "../state/useOceanStore";
 import OceanBackground from "../components/OceanBackground";
 
 export default function LandingPage() {
-  const setPage = useOceanStore((s) => s.setPage);
   const user = useOceanStore((s) => s.user);
 
   return (
-    <div className="relative flex flex-col h-screen w-screen overflow-hidden ocean-bg-animated">
+    <main id="main" className="relative flex flex-col h-screen w-screen overflow-hidden ocean-bg-animated">
       {/* Interactive ocean background: waves, shimmer, bubbles */}
       <OceanBackground />
 
@@ -57,15 +56,17 @@ export default function LandingPage() {
 
         {/* CTA Buttons */}
         <div className="flex flex-col sm:flex-row gap-4">
-          <button
-            onClick={() => setPage(user ? "dashboard" : "login")}
-            className="px-8 py-3 rounded-lg text-sm font-semibold transition-all"
+          <a
+            href={user ? "#/dashboard" : "#/login"}
+            className="px-8 py-3 rounded-lg text-sm font-semibold"
             style={{
               background: "var(--accent-cyan)",
               color: "#000",
               border: "none",
               cursor: "pointer",
+              textDecoration: "none",
               boxShadow: "0 0 30px rgba(6, 182, 212, 0.3)",
+              transition: "box-shadow 0.2s ease, transform 0.2s ease",
             }}
             onMouseEnter={(e) => {
               e.currentTarget.style.boxShadow = "0 0 50px rgba(6, 182, 212, 0.5)";
@@ -77,16 +78,18 @@ export default function LandingPage() {
             }}
           >
             {user ? "Launch Dashboard" : "Get Started"}
-          </button>
+          </a>
 
-          <button
-            onClick={() => setPage("about")}
-            className="px-8 py-3 rounded-lg text-sm font-semibold transition-all"
+          <a
+            href="#/about"
+            className="px-8 py-3 rounded-lg text-sm font-semibold"
             style={{
               background: "transparent",
               color: "var(--text-primary)",
               border: "1px solid rgba(148, 163, 184, 0.3)",
               cursor: "pointer",
+              textDecoration: "none",
+              transition: "border-color 0.2s ease, color 0.2s ease",
             }}
             onMouseEnter={(e) => {
               e.currentTarget.style.borderColor = "var(--accent-cyan)";
@@ -98,7 +101,7 @@ export default function LandingPage() {
             }}
           >
             Learn More
-          </button>
+          </a>
         </div>
       </div>
 
@@ -110,6 +113,6 @@ export default function LandingPage() {
         <span>Problem Statement 26067</span>
         <span>Web-Based Interactive 3D Ocean Data Visualization</span>
       </div>
-    </div>
+    </main>
   );
 }

@@ -7,7 +7,6 @@ import OAuthButtons from "../components/OAuthButtons";
 export default function LoginPage() {
   const loginWithEmail = useOceanStore((s) => s.loginWithEmail);
   const handleOAuthToken = useOceanStore((s) => s.handleOAuthToken);
-  const setPage = useOceanStore((s) => s.setPage);
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -55,7 +54,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="relative flex flex-col h-screen w-screen overflow-hidden ocean-bg-animated">
+    <main id="main" className="relative flex flex-col h-screen w-screen overflow-hidden ocean-bg-animated">
       <OceanBackground />
 
       <div className="relative z-10 flex flex-col items-center justify-center flex-1 px-6">
@@ -78,15 +77,18 @@ export default function LoginPage() {
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             <div>
-              <label className="block text-xs mb-1" style={{ color: "var(--text-muted)" }}>
+              <label htmlFor="login-email" className="block text-xs mb-1" style={{ color: "var(--text-muted)" }}>
                 Email
               </label>
               <input
+                id="login-email"
+                name="email"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="you@example.com"
                 autoComplete="email"
+                spellCheck={false}
                 disabled={submitting}
                 className="w-full px-3 py-2 text-sm rounded-lg outline-none"
                 style={{ background: "#1e293b", border: "1px solid #334155", color: "var(--text-primary)" }}
@@ -96,10 +98,12 @@ export default function LoginPage() {
             </div>
 
             <div>
-              <label className="block text-xs mb-1" style={{ color: "var(--text-muted)" }}>
+              <label htmlFor="login-password" className="block text-xs mb-1" style={{ color: "var(--text-muted)" }}>
                 Password
               </label>
               <input
+                id="login-password"
+                name="password"
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -114,13 +118,13 @@ export default function LoginPage() {
             </div>
 
             {error && (
-              <p className="text-xs" style={{ color: "#f87171" }}>{error}</p>
+              <p role="status" aria-live="polite" className="text-xs" style={{ color: "#f87171" }}>{error}</p>
             )}
 
             <button
               type="submit"
               disabled={submitting}
-              className="w-full py-2.5 rounded-lg text-sm font-semibold transition-all disabled:opacity-50"
+              className="w-full py-2.5 rounded-lg text-sm font-semibold transition-colors disabled:opacity-50"
               style={{
                 background: "var(--accent-cyan)",
                 color: "#000",
@@ -152,37 +156,32 @@ export default function LoginPage() {
           <div className="mt-6 text-center">
             <p className="text-xs mb-2" style={{ color: "var(--text-muted)" }}>
               Don&apos;t have an account?{" "}
-              <button
-                onClick={() => setPage("signup")}
-                disabled={submitting}
+              <a
+                href="#/signup"
                 className="transition-colors"
                 style={{
                   color: "var(--accent-cyan)",
-                  background: "none",
-                  border: "none",
-                  cursor: "pointer",
+                  textDecoration: "none",
                 }}
               >
                 Sign up
-              </button>
+              </a>
             </p>
-            <button
-              onClick={() => setPage("landing")}
+            <a
+              href="#/landing"
               className="text-xs transition-colors"
               style={{
                 color: "var(--text-muted)",
-                background: "none",
-                border: "none",
-                cursor: "pointer",
+                textDecoration: "none",
               }}
               onMouseEnter={(e) => { e.currentTarget.style.color = "var(--accent-cyan)"; }}
               onMouseLeave={(e) => { e.currentTarget.style.color = "var(--text-muted)"; }}
             >
               ← Back to home
-            </button>
+            </a>
           </div>
         </div>
       </div>
-    </div>
+    </main>
   );
 }

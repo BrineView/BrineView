@@ -29,7 +29,7 @@ export default function DashboardPage() {
   if (!user) return null;
 
   return (
-    <div className="flex flex-col h-screen w-screen" style={{ background: "var(--ocean-bg)" }}>
+    <main id="main" className="flex flex-col h-screen w-screen" style={{ background: "var(--ocean-bg)" }}>
       <TopBar />
       <div className="flex flex-1 overflow-hidden">
         <ControlPanel />
@@ -40,6 +40,6 @@ export default function DashboardPage() {
       </div>
       <UserDataModal />
       <Footer />
-    </div>
+    </main>
   );
 }

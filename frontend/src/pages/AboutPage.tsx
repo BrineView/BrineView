@@ -2,7 +2,6 @@ import { useOceanStore } from "../state/useOceanStore";
 import OceanBackground from "../components/OceanBackground";
 
 export default function AboutPage() {
-  const setPage = useOceanStore((s) => s.setPage);
   const user = useOceanStore((s) => s.user);
   const logout = useOceanStore((s) => s.logout);
 
@@ -34,7 +33,7 @@ export default function AboutPage() {
   ];
 
   return (
-    <div className="relative flex flex-col min-h-screen w-screen ocean-bg-animated">
+    <main id="main" className="relative flex flex-col min-h-screen w-screen ocean-bg-animated">
       {/* Interactive ocean background */}
       <OceanBackground />
 
@@ -44,22 +43,22 @@ export default function AboutPage() {
         style={{ borderBottom: "1px solid rgba(30, 41, 59, 0.5)" }}
       >
         <div className="flex items-center gap-6">
-          <button
-            onClick={() => setPage("landing")}
+          <a
+            href="#/landing"
             className="text-lg font-bold"
-            style={{ color: "var(--accent-cyan)", background: "none", border: "none", cursor: "pointer" }}
+            style={{ color: "var(--accent-cyan)", textDecoration: "none" }}
           >
             BrineView
-          </button>
-          <button
-            onClick={() => setPage(user ? "dashboard" : "login")}
+          </a>
+          <a
+            href={user ? "#/dashboard" : "#/login"}
             className="text-xs transition-colors"
-            style={{ color: "var(--text-muted)", background: "none", border: "none", cursor: "pointer" }}
+            style={{ color: "var(--text-muted)", textDecoration: "none" }}
             onMouseEnter={(e) => { e.currentTarget.style.color = "var(--accent-cyan)"; }}
             onMouseLeave={(e) => { e.currentTarget.style.color = "var(--text-muted)"; }}
           >
             Dashboard
-          </button>
+          </a>
         </div>
         {user && (
           <div className="flex items-center gap-3 text-xs" style={{ color: "var(--text-muted)" }}>
@@ -100,7 +99,7 @@ export default function AboutPage() {
           {features.map((f) => (
             <div
               key={f.title}
-              className="p-5 rounded-xl transition-all"
+              className="p-5 rounded-xl transition-colors"
               style={{
                 background: "rgba(17, 24, 39, 0.7)",
                 border: "1px solid rgba(30, 41, 59, 0.6)",
@@ -156,15 +155,17 @@ export default function AboutPage() {
 
         {/* CTA */}
         <div className="mt-12">
-          <button
-            onClick={() => setPage(user ? "dashboard" : "login")}
-            className="px-8 py-3 rounded-lg text-sm font-semibold transition-all"
+          <a
+            href={user ? "#/dashboard" : "#/login"}
+            className="px-8 py-3 rounded-lg text-sm font-semibold"
             style={{
               background: "var(--accent-cyan)",
               color: "#000",
               border: "none",
               cursor: "pointer",
+              textDecoration: "none",
               boxShadow: "0 0 30px rgba(6, 182, 212, 0.3)",
+              transition: "box-shadow 0.2s ease, transform 0.2s ease",
             }}
             onMouseEnter={(e) => {
               e.currentTarget.style.boxShadow = "0 0 50px rgba(6, 182, 212, 0.5)";
@@ -176,9 +177,9 @@ export default function AboutPage() {
             }}
           >
             {user ? "Open Dashboard" : "Sign In to Explore"}
-          </button>
+          </a>
         </div>
       </div>
-    </div>
+    </main>
   );
 }

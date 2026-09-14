@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { useOceanStore } from "./state/useOceanStore";
+import { hashToPage, pageToHash } from "./lib/router";
 import LandingPage from "./pages/LandingPage";
 import LoginPage from "./pages/LoginPage";
 import SignUpPage from "./pages/SignUpPage";
@@ -10,6 +11,22 @@ export default function App() {
   const currentPage = useOceanStore((s) => s.currentPage);
   const authLoading = useOceanStore((s) => s.authLoading);
   const restoreSession = useOceanStore((s) => s.restoreSession);
+  const setPage = useOceanStore((s) => s.setPage);
+
+  // Keep the page id in sync with the URL hash (deep links, back/forward).
+  useEffect(() => {
+    if (window.location.hash) {
+      setPage(hashToPage(window.location.hash));
+    }
+    const onHash = () => setPage(hashToPage(window.location.hash));
+    window.addEventListener("hashchange", onHash);
+    return () => window.removeEventListener("hashchange", onHash);
+  }, [setPage]);
+
+  useEffect(() => {
+    const h = pageToHash(currentPage);
+    if (window.location.hash !== h) window.location.hash = h;
+  }, [currentPage]);
 
   useEffect(() => {
     void restoreSession();
@@ -38,18 +55,25 @@ export default function App() {
     );
   }
 
-  switch (currentPage) {
-    case "landing":
-      return <LandingPage />;
-    case "login":
-      return <LoginPage />;
-    case "signup":
-      return <SignUpPage />;
-    case "about":
-      return <AboutPage />;
-    case "dashboard":
-      return <DashboardPage />;
-    default:
-      return <LandingPage />;
-  }
+  return (
+    <>
+      <a href="#main" className="skip-link">
+        Skip to content
+      </a>
+      {(() => {
+        switch (currentPage) {
+          case "login":
+            return <LoginPage />;
+          case "signup":
+            return <SignUpPage />;
+          case "about":
+            return <AboutPage />;
+          case "dashboard":
+            return <DashboardPage />;
+          default:
+            return <LandingPage />;
+        }
+      })()}
+    </>
+  );
 }

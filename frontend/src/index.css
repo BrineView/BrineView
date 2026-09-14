@@ -24,6 +24,11 @@
   box-sizing: border-box;
 }
 
+html {
+  color-scheme: dark;
+  -webkit-tap-highlight-color: transparent;
+}
+
 body {
   margin: 0;
   padding: 0;
@@ -32,6 +37,13 @@ body {
   font-family: var(--font-body);
   overflow-x: hidden;
   overflow-y: auto;
+  touch-action: manipulation;
+}
+
+h1,
+h2,
+h3 {
+  text-wrap: balance;
 }
 
 #root {
@@ -65,6 +77,7 @@ body {
 
 .font-data {
   font-family: var(--font-data);
+  font-variant-numeric: tabular-nums;
 }
 
 .eyebrow {
@@ -73,6 +86,26 @@ body {
   text-transform: uppercase;
   letter-spacing: 0.18em;
   color: var(--text-muted);
+}
+
+/* Skip-to-content link: hidden until keyboard focus */
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  z-index: 100;
+  padding: 10px 14px;
+  border-radius: 0 0 10px 0;
+  background: var(--panel-bg);
+  border-bottom: 1px solid var(--accent-cyan);
+  border-right: 1px solid var(--accent-cyan);
+  color: var(--accent-cyan);
+  font-size: 13px;
+  text-decoration: none;
+}
+
+.skip-link:focus-visible {
+  left: 0;
 }
 
 /* Legend gradient bar */
@@ -129,18 +162,29 @@ input[type="range"]::-moz-range-thumb {
 /* Interactive ocean background (landing / login / about pages)        */
 /* ------------------------------------------------------------------ */
 
-/* Animated gradient drift */
+/* Animated gradient drift (transform/opacity only — compositor-friendly) */
 @keyframes ocean-drift {
   0%,
   100% {
-    background-position: 0% 50%;
+    transform: translate3d(-6%, -3%, 0);
   }
   50% {
-    background-position: 100% 50%;
+    transform: translate3d(6%, 3%, 0);
   }
 }
 
 .ocean-bg-animated {
+  position: relative;
+  background: var(--ocean-bg);
+}
+
+.ocean-bg-animated::before {
+  content: "";
+  position: absolute;
+  top: -45%;
+  left: -45%;
+  right: -45%;
+  bottom: -45%;
   background: linear-gradient(
     135deg,
     #050d1a 0%,
@@ -149,7 +193,6 @@ input[type="range"]::-moz-range-thumb {
     #08203c 70%,
     #050d1a 100%
   );
-  background-size: 300% 300%;
   animation: ocean-drift 16s ease-in-out infinite;
 }
 
