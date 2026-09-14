@@ -1,15 +1,31 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
-import type { FieldResponse, FloatMeta } from "../../types/ocean";
+import type { BathymetryResponse, FieldResponse, FloatMeta } from "../../types/ocean";
 import { buildFieldTexture, autoScaleBounds } from "../../lib/colormaps";
 
-const WORLD_X_SPAN = 35; // lon 60..95
-const WORLD_Z_SPAN = 25; // lat 0..25
+const WORLD_X_SPAN = 35; // lon 92..106
+const WORLD_Z_SPAN = 25; // lat -4..15
+
+// World-units per metre of terrain elevation: −5939 m trench → ~ −18
+const TERRAIN_SCALE = 0.003;
 
 function latLonToWorld(lat: number, lon: number, latRange: [number, number], lonRange: [number, number]): { x: number; z: number } {
   const x = ((lon - lonRange[0]) / (lonRange[1] - lonRange[0]) - 0.5) * WORLD_X_SPAN;
   const z = ((lat - latRange[0]) / (latRange[1] - latRange[0]) - 0.5) * WORLD_Z_SPAN;
   return { x, z };
+}
+
+type RGB = [number, number, number];
+
+/** Elevation (m, sea level = 0) → terrain vertex colour. */
+function terrainColor(z: number): RGB {
+  if (z >= 800) return [142, 112, 60]; // high land (brown)
+  if (z >= 200) return [112, 138, 62]; // lowland (olive green)
+  if (z >= 0) return [84, 150, 74]; // coast (green)
+  if (z >= -200) return [47, 127, 191]; // shallow shelf
+  if (z >= -1000) return [27, 90, 167]; // continental slope
+  if (z >= -2500) return [16, 58, 122]; // deep sea
+  return [10, 31, 77]; // abyss / trench
 }
 
 export class OceanScene {
@@ -18,6 +34,7 @@ export class OceanScene {
   private camera: THREE.PerspectiveCamera;
   private controls: OrbitControls;
   private surfaceMesh: THREE.Mesh | null = null;
+  private terrainMesh: THREE.Mesh | null = null;
   private markerGroup: THREE.Group;
 
   // Depth-layer stack (translucent planes below the surface)
@@ -36,8 +53,8 @@ export class OceanScene {
   private currentOpacity = 1;
   private showFloats = true;
   private selectedFloatId: string | null = null;
-  private latRange: [number, number] = [0, 25];
-  private lonRange: [number, number] = [60, 95];
+  private latRange: [number, number] = [-4, 15];
+  private lonRange: [number, number] = [92, 106];
 
   // Callbacks
   onFloatClick: ((id: string) => void) | null = null;
@@ -46,6 +63,7 @@ export class OceanScene {
   // Internal marker data
   private markerMeshes: THREE.Mesh[] = [];
   private markerFloatIds: string[] = [];
+  private _markerFloats: FloatMeta[] = [];
 
   // Drag detection for raycasting
   private pointerDownPos = { x: 0, y: 0 };
@@ -260,7 +278,94 @@ export class OceanScene {
     }
   }
 
+  /**
+   * Render the real sea floor (GMRT) as terrain beneath the variable surface.
+   * Vertices are displaced by elevation·TERRAIN_SCALE, land (z ≥ 0) rises
+   * above the water line as islands, and each vertex is colored by depth band.
+   */
+  setBathymetry(bathy: BathymetryResponse) {
+    if (bathy.lat.length < 2 || bathy.lon.length < 2) return;
+
+    this.latRange = [bathy.lat[0], bathy.lat[bathy.lat.length - 1]];
+    this.lonRange = [bathy.lon[0], bathy.lon[bathy.lon.length - 1]];
+
+    // Dispose old terrain
+    if (this.terrainMesh) {
+      this.oceanGroup.remove(this.terrainMesh);
+      this.terrainMesh.geometry.dispose();
+      (this.terrainMesh.material as THREE.Material).dispose();
+      this.terrainMesh = null;
+    }
+
+    const nLat = bathy.lat.length;
+    const nLon = bathy.lon.length;
+
+    const positions = new Float32Array(nLat * nLon * 3);
+    const colors = new Float32Array(nLat * nLon * 3);
+    const indices: number[] = [];
+
+    for (let i = 0; i < nLat; i++) {
+      for (let j = 0; j < nLon; j++) {
+        const idx = i * nLon + j;
+        const z = bathy.values[i]?.[j] ?? null;
+        const { x, z: wz } = latLonToWorld(bathy.lat[i], bathy.lon[j], this.latRange, this.lonRange);
+        positions[idx * 3] = x;
+        // Land rises above the water line; seabed drops below it.
+        positions[idx * 3 + 1] = z === null ? -0.1 : z * TERRAIN_SCALE;
+        positions[idx * 3 + 2] = wz;
+
+        const c = z === null ? null : terrainColor(z);
+        colors[idx * 3] = c ? c[0] / 255 : 0;
+        colors[idx * 3 + 1] = c ? c[1] / 255 : 0;
+        colors[idx * 3 + 2] = c ? c[2] / 255 : 0;
+      }
+    }
+
+    for (let i = 0; i < nLat - 1; i++) {
+      for (let j = 0; j < nLon - 1; j++) {
+        const a = i * nLon + j;
+        const b = i * nLon + j + 1;
+        const c = (i + 1) * nLon + j;
+        const d = (i + 1) * nLon + j + 1;
+        indices.push(a, b, c, b, d, c);
+      }
+    }
+
+    const geom = new THREE.BufferGeometry();
+    geom.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+    geom.setAttribute("color", new THREE.BufferAttribute(colors, 3));
+    geom.setIndex(indices);
+    geom.computeVertexNormals();
+
+    const material = new THREE.MeshLambertMaterial({
+      vertexColors: true,
+      flatShading: true,
+      side: THREE.DoubleSide,
+    });
+
+    this.terrainMesh = new THREE.Mesh(geom, material);
+    this.oceanGroup.add(this.terrainMesh);
+    // Re-apply marker positions in case ranges changed
+    if (this.markerMeshes.length > 0) {
+      this.repositionMarkers();
+    }
+  }
+
+  private repositionMarkers() {
+    for (const mesh of this.markerMeshes) {
+      const fid = mesh.userData.floatId as string;
+      const idx = this.markerFloatIds.indexOf(fid);
+      if (idx < 0) continue;
+      // floats are stored as FloatMeta[]; keep a lightweight lookup
+      const f = this._markerFloats[idx];
+      if (!f) continue;
+      const { x, z } = latLonToWorld(f.lat, f.lon, this.latRange, this.lonRange);
+      mesh.position.set(x, 0.8, z);
+    }
+  }
+
   setFloats(floats: FloatMeta[]) {
+    this._markerFloats = floats;
     // Clear existing markers
     while (this.markerGroup.children.length > 0) {
       const child = this.markerGroup.children[0];
@@ -389,6 +494,12 @@ export class OceanScene {
       (layer.mesh.material as THREE.Material).dispose();
     }
     this.depthLayers = [];
+
+    if (this.terrainMesh) {
+      this.terrainMesh.geometry.dispose();
+      (this.terrainMesh.material as THREE.Material).dispose();
+      this.terrainMesh = null;
+    }
 
     this.renderer.dispose();
     if (this.renderer.domElement.parentNode) {

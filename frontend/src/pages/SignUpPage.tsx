@@ -69,7 +69,7 @@ export default function SignUpPage() {
               Create your account
             </h1>
             <p className="text-xs" style={{ color: "var(--text-muted)" }}>
-              Sign up to access OceanLens 3D
+              Sign up to access BrineView
             </p>
           </div>
 

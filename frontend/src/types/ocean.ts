@@ -16,6 +16,15 @@ export interface FieldResponse {
   max: number;
 }
 
+export interface BathymetryResponse {
+  units: string;
+  lat: number[];
+  lon: number[];
+  values: (number | null)[][];
+  min: number;
+  max: number;
+}
+
 export interface FloatMeta {
   id: string;
   lat: number;

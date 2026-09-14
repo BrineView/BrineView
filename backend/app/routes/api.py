@@ -32,6 +32,13 @@ def get_field(
         raise HTTPException(status_code=400, detail=str(e))
 
 
+@router.get("/bathymetry")
+def get_bathymetry(
+    adapter: DataAdapter = Depends(get_adapter),
+) -> dict[str, Any]:
+    return adapter.get_bathymetry()
+
+
 @router.get("/floats")
 def list_floats(adapter: DataAdapter = Depends(get_adapter)) -> list[dict[str, Any]]:
     return adapter.list_floats()

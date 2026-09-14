@@ -43,7 +43,7 @@ export default function LandingPage() {
           className="text-lg md:text-xl mb-2"
           style={{ color: "var(--accent-cyan)" }}
         >
-          OceanLens 3D
+          Interactive 3D Ocean Explorer
         </p>
 
         <p

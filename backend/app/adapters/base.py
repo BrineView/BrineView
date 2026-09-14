@@ -26,6 +26,15 @@ class DataAdapter(ABC):
         ...
 
     @abstractmethod
+    def get_bathymetry(self) -> dict[str, Any]:
+        """Return the sea-floor terrain grid (meters, -ve below sea level).
+
+        Shape of ``values`` matches ``(lat, lon)`` like ``get_field`` so the
+        frontend can displace the same mesh.
+        """
+        ...
+
+    @abstractmethod
     def list_floats(self) -> list[dict[str, Any]]:
         """Return lightweight list of float positions."""
         ...

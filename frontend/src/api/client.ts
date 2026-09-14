@@ -1,4 +1,10 @@
-import type { FieldResponse, FloatDetail, FloatMeta, MetaResponse } from "../types/ocean";
+import type {
+  BathymetryResponse,
+  FieldResponse,
+  FloatDetail,
+  FloatMeta,
+  MetaResponse,
+} from "../types/ocean";
 
 const BASE = "/api";
 const TIMEOUT = 15000;
@@ -74,6 +80,10 @@ export function getField(params: {
 
 export function getFloats(): Promise<FloatMeta[]> {
   return fetchJson<FloatMeta[]>(`${BASE}/floats`);
+}
+
+export function getBathymetry(): Promise<BathymetryResponse> {
+  return fetchJson<BathymetryResponse>(`${BASE}/bathymetry`);
 }
 
 export function getFloatDetail(id: string): Promise<FloatDetail> {

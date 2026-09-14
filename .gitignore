@@ -9,3 +9,6 @@ __pycache__/
 *.egg-info/
 SIH2026-Brineview.pptx
 backend/data/users.json
+# Rebuild-only caches (not needed for the offline demo; regenerate with build_real_dataset.py)
+backend/data/_gmrt_raw.nc
+backend/data/_argo_index.tsv

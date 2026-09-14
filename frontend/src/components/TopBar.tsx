@@ -32,7 +32,7 @@ export default function TopBar() {
           BrineView
         </button>
         <span className="text-sm" style={{ color: "var(--text-muted)" }}>
-          OceanLens 3D
+          Andaman Sea · Sumatra Trench
         </span>
       </div>
 

@@ -18,6 +18,7 @@ export default function OceanViewport() {
   const showFloats = useOceanStore((s) => s.showFloats);
   const selectedFloatId = useOceanStore((s) => s.selectedFloatId);
   const floats = useOceanStore((s) => s.floats);
+  const bathymetry = useOceanStore((s) => s.bathymetry);
   const variable = useOceanStore((s) => s.variable);
   const depth = useOceanStore((s) => s.depth);
   const timeIndex = useOceanStore((s) => s.timeIndex);
@@ -87,6 +88,13 @@ export default function OceanViewport() {
   useEffect(() => {
     sceneRef.current?.setFloats(floats);
   }, [floats]);
+
+  // Update bathymetry terrain
+  useEffect(() => {
+    if (sceneRef.current && bathymetry) {
+      sceneRef.current.setBathymetry(bathymetry);
+    }
+  }, [bathymetry]);
 
   // Update selected float
   useEffect(() => {

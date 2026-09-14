@@ -88,10 +88,11 @@ export default function AboutPage() {
           className="max-w-2xl text-center text-sm md:text-base leading-relaxed mb-12"
           style={{ color: "var(--text-muted)" }}
         >
-          BrineView (OceanLens 3D) is a browser-native 3D workspace built for
-          Smart India Hackathon 2026 (Problem Statement 26067). It visualizes
-          Indian Ocean model fields together with real point observations from
-          Argo floats, across depth and time.
+          BrineView is a browser-native 3D workspace built for Smart India
+          Hackathon 2026 (Problem Statement 26067). It visualizes a real,
+          high-resolution model of the Andaman Sea and Sumatra Trench sea
+          floor, Indian Ocean model fields, and point observations from Argo
+          floats, across depth and time.
         </p>
 
         {/* Features grid */}

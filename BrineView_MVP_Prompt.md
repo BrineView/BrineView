@@ -1,6 +1,6 @@
 # BUILD PROMPT — Paste this whole file into opencode as your first message
 
-You are building an MVP for **BrineView (OceanLens 3D)** — a Smart India Hackathon 2026 entry for
+You are building an MVP for **BrineView** — a Smart India Hackathon 2026 entry for
 Problem Statement 26067: "Web-Based Interactive 3D Ocean Data Visualization Platform"
 (Theme: Disaster Management, Category: Software, Team: Paradox).
 

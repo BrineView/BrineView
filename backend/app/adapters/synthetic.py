@@ -8,6 +8,8 @@ import xarray as xr
 
 from .base import DataAdapter
 
+_BATHY_FILE = "bathymetry.nc"
+
 # Resolve data directory relative to this file
 _DATA_DIR = Path(__file__).resolve().parent.parent.parent / "data"
 
@@ -31,9 +33,15 @@ def _sanitize(arr: Any) -> Any:
 class SyntheticAdapter(DataAdapter):
     """Reads from a locally generated NetCDF file + floats.json."""
 
-    def __init__(self, nc_path: str | Path | None = None, floats_path: str | Path | None = None):
+    def __init__(
+        self,
+        nc_path: str | Path | None = None,
+        floats_path: str | Path | None = None,
+        bathy_path: str | Path | None = None,
+    ):
         nc = Path(nc_path) if nc_path else _DATA_DIR / "ocean_demo.nc"
         fp = Path(floats_path) if floats_path else _DATA_DIR / "floats.json"
+        bp = Path(bathy_path) if bathy_path else _DATA_DIR / _BATHY_FILE
 
         if not nc.exists():
             raise FileNotFoundError(f"NetCDF not found: {nc}")
@@ -47,6 +55,16 @@ class SyntheticAdapter(DataAdapter):
 
         with open(fp, "r") as f:
             self._floats: list[dict] = json.load(f)
+
+        self._bathy: xr.Dataset | None = None
+        if bp.exists():
+            try:
+                self._bathy = xr.open_dataset(str(bp), engine="netcdf4")
+            except Exception:
+                try:
+                    self._bathy = xr.open_dataset(str(bp), engine="h5netcdf")
+                except Exception:
+                    self._bathy = None
 
         self._float_map: dict[str, dict] = {fl["id"]: fl for fl in self._floats}
         self._depths: list[float] = self._ds.depth.values.tolist()
@@ -90,6 +108,41 @@ class SyntheticAdapter(DataAdapter):
             "values": values,
             "min": vmin,
             "max": vmax,
+        }
+
+    def get_bathymetry(self) -> dict[str, Any]:
+        """Sea-floor terrain on the same (lat, lon) grid as ``get_field``.
+
+        The raw GMRT grid (0.025 deg) is nearest-neighbour-sampled onto the
+        field grid so the frontend can displace its existing surface mesh
+        vertex-for-vertex. Elevation is metres relative to sea level (negative
+        below water). Cells with no data come back as ``None``.
+        """
+        if self._bathy is None:
+            return {
+                "units": "m",
+                "lat": [],
+                "lon": [],
+                "values": [],
+                "min": 0,
+                "max": 1,
+            }
+
+        da = self._bathy["bathymetry"]
+        bathy_on_field = da.sel(
+            lat=self._lats, lon=self._lons, method="nearest"
+        )
+        values = _sanitize(bathy_on_field.values)
+        flat = [v for row in values for v in row if v is not None]
+        zmin = min(flat) if flat else 0.0
+        zmax = max(flat) if flat else 1.0
+        return {
+            "units": "m",
+            "lat": _sanitize(self._lats.tolist()),
+            "lon": _sanitize(self._lons.tolist()),
+            "values": values,
+            "min": zmin,
+            "max": zmax,
         }
 
     def list_floats(self) -> list[dict[str, Any]]:

@@ -72,7 +72,7 @@ export default function LoginPage() {
               BrineView
             </h1>
             <p className="text-xs" style={{ color: "var(--text-muted)" }}>
-              Welcome back — sign in to access OceanLens 3D
+              Welcome back — sign in to access BrineView
             </p>
           </div>
 

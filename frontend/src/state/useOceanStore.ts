@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import type {
+  BathymetryResponse,
   FieldResponse,
   FloatDetail,
   FloatMeta,
@@ -67,6 +68,7 @@ interface OceanState {
   field: FieldResponse | null;
   fieldLoading: boolean;
   fieldError: string | null;
+  bathymetry: BathymetryResponse | null;
   floats: FloatMeta[];
   floatDetail: FloatDetail | null;
   floatDetailLoading: boolean;
@@ -92,6 +94,7 @@ interface OceanState {
   selectFloat: (id: string | null) => void;
   loadMeta: () => Promise<void>;
   loadFloats: () => Promise<void>;
+  loadBathymetry: () => Promise<void>;
   loadField: (variable: string, depth: number, timeIndex: number) => Promise<void>;
   loadFloatDetail: (id: string) => Promise<void>;
   closeProfilePanel: () => void;
@@ -128,6 +131,7 @@ export const useOceanStore = create<OceanState>((set, get) => ({
   field: null,
   fieldLoading: false,
   fieldError: null,
+  bathymetry: null,
   floats: [],
   floatDetail: null,
   floatDetailLoading: false,
@@ -220,6 +224,15 @@ export const useOceanStore = create<OceanState>((set, get) => ({
       set({ floats });
     } catch {
       // floats stays empty
+    }
+  },
+
+  loadBathymetry: async () => {
+    try {
+      const bathymetry = await api.getBathymetry();
+      set({ bathymetry });
+    } catch {
+      // bathymetry stays null → flat surface terrain fallback
     }
   },
 
