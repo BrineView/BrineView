@@ -1,5 +1,5 @@
 import type { AuthResponse, AuthStatus } from "../types/auth";
-import { fetchJson, fetchJsonAuth, postJson } from "./client";
+import { fetchJson, postJson } from "./client";
 
 const AUTH = "/api/auth";
 
@@ -18,8 +18,15 @@ export function loginWithEmail(
   return postJson<AuthResponse>(`${AUTH}/login`, { email, password });
 }
 
-export function getMe(token: string): Promise<{ user: AuthResponse["user"] }> {
-  return fetchJsonAuth<{ user: AuthResponse["user"] }>(`${AUTH}/me`, token);
+export async function getMe(token: string): Promise<{ user: AuthResponse["user"] }> {
+  const res = await fetch(`${AUTH}/me`, {
+    headers: { Authorization: `Bearer ${token}` },
+    signal: AbortSignal.timeout(15000),
+  });
+  if (!res.ok) {
+    throw new Error(`API error ${res.status}`);
+  }
+  return res.json();
 }
 
 export function getAuthStatus(): Promise<AuthStatus> {

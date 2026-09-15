@@ -6,6 +6,7 @@ import LoginPage from "./pages/LoginPage";
 import SignUpPage from "./pages/SignUpPage";
 import DashboardPage from "./pages/DashboardPage";
 import AboutPage from "./pages/AboutPage";
+import ErrorBoundary from "./components/ErrorBoundary";
 
 export default function App() {
   const currentPage = useOceanStore((s) => s.currentPage);
@@ -56,7 +57,7 @@ export default function App() {
   }
 
   return (
-    <>
+    <ErrorBoundary>
       <a href="#main" className="skip-link">
         Skip to content
       </a>
@@ -74,6 +75,6 @@ export default function App() {
             return <LandingPage />;
         }
       })()}
-    </>
+    </ErrorBoundary>
   );
 }
