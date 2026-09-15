@@ -37,3 +37,11 @@ if JWT_SECRET == DEV_JWT_SECRET:
         "JWT_SECRET is not set in the environment — using the development default. "
         "Set JWT_SECRET to a strong secret in production."
     )
+
+ENVIRONMENT = os.environ.get("ENVIRONMENT", "development")
+
+if JWT_SECRET == DEV_JWT_SECRET and ENVIRONMENT != "development":
+    raise RuntimeError(
+        "JWT_SECRET must be set to a strong secret in non-development environments. "
+        "Set the JWT_SECRET environment variable."
+    )
