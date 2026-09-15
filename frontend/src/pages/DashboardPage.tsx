@@ -1,5 +1,6 @@
 import { useEffect } from "react";
-import { useOceanStore } from "../state/useOceanStore";
+import { useAuthStore } from "../state/useAuthStore";
+import { useDataStore } from "../state/useDataStore";
 import TopBar from "../components/TopBar";
 import ControlPanel from "../components/ControlPanel";
 import OceanViewport from "../components/three/OceanViewport";
@@ -8,11 +9,11 @@ import UserDataModal from "../components/UserDataModal";
 import Footer from "../components/Footer";
 
 export default function DashboardPage() {
-  const user = useOceanStore((s) => s.user);
-  const setPage = useOceanStore((s) => s.setPage);
-  const loadMeta = useOceanStore((s) => s.loadMeta);
-  const loadFloats = useOceanStore((s) => s.loadFloats);
-  const loadBathymetry = useOceanStore((s) => s.loadBathymetry);
+  const user = useAuthStore((s) => s.user);
+  const setPage = useAuthStore((s) => s.setPage);
+  const loadMeta = useDataStore((s) => s.loadMeta);
+  const loadFloats = useDataStore((s) => s.loadFloats);
+  const loadBathymetry = useDataStore((s) => s.loadBathymetry);
 
   useEffect(() => {
     // Auth guard — redirect unauthenticated visitors to the login screen

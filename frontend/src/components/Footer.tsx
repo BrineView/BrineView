@@ -1,9 +1,10 @@
+import { useDataStore } from "../state/useDataStore";
 import { useOceanStore } from "../state/useOceanStore";
 import { formatTime } from "../lib/format";
 
 export default function Footer() {
-  const meta = useOceanStore((s) => s.meta);
-  const field = useOceanStore((s) => s.field);
+  const meta = useDataStore((s) => s.meta);
+  const field = useDataStore((s) => s.field);
   const timeIndex = useOceanStore((s) => s.timeIndex);
 
   const times = meta?.times ?? [];

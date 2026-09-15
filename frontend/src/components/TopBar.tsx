@@ -1,13 +1,15 @@
+import { useDataStore } from "../state/useDataStore";
+import { useAuthStore } from "../state/useAuthStore";
 import { useOceanStore } from "../state/useOceanStore";
 import Legend from "./Legend";
 import { formatTime } from "../lib/format";
 
 export default function TopBar() {
-  const field = useOceanStore((s) => s.field);
-  const meta = useOceanStore((s) => s.meta);
+  const field = useDataStore((s) => s.field);
+  const meta = useDataStore((s) => s.meta);
   const timeIndex = useOceanStore((s) => s.timeIndex);
-  const user = useOceanStore((s) => s.user);
-  const logout = useOceanStore((s) => s.logout);
+  const user = useAuthStore((s) => s.user);
+  const logout = useAuthStore((s) => s.logout);
 
   const currentTime = meta?.times?.[timeIndex] ?? field?.time ?? "";
 

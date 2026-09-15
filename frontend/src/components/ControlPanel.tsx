@@ -5,10 +5,10 @@ import ColorscaleSelect from "./controls/ColorscaleSelect";
 import OpacitySlider from "./controls/OpacitySlider";
 import Toggle from "./controls/Toggle";
 import FloatInfoCard from "./FloatInfoCard";
-import { useOceanStore } from "../state/useOceanStore";
+import { useUploadStore } from "../state/useUploadStore";
 
 export default function ControlPanel() {
-  const openUserData = useOceanStore((s) => s.openUserData);
+  const openUserData = useUploadStore((s) => s.openUserData);
 
   return (
     <aside

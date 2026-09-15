@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 import { getAuthStatus } from "../api/auth";
-import { useOceanStore } from "../state/useOceanStore";
+import { useAuthStore } from "../state/useAuthStore";
 import type { AuthStatus } from "../types/auth";
 
 export default function OAuthButtons() {
   const [status, setStatus] = useState<AuthStatus | null>(null);
-  const loginWithGoogle = useOceanStore((s) => s.loginWithGoogle);
-  const loginWithGithub = useOceanStore((s) => s.loginWithGithub);
+  const loginWithGoogle = useAuthStore((s) => s.loginWithGoogle);
+  const loginWithGithub = useAuthStore((s) => s.loginWithGithub);
 
   useEffect(() => {
     let alive = true;

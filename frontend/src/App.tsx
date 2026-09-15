@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useOceanStore } from "./state/useOceanStore";
+import { useAuthStore } from "./state/useAuthStore";
 import { hashToPage, pageToHash } from "./lib/router";
 import LandingPage from "./pages/LandingPage";
 import LoginPage from "./pages/LoginPage";
@@ -9,10 +9,10 @@ import AboutPage from "./pages/AboutPage";
 import ErrorBoundary from "./components/ErrorBoundary";
 
 export default function App() {
-  const currentPage = useOceanStore((s) => s.currentPage);
-  const authLoading = useOceanStore((s) => s.authLoading);
-  const restoreSession = useOceanStore((s) => s.restoreSession);
-  const setPage = useOceanStore((s) => s.setPage);
+  const currentPage = useAuthStore((s) => s.currentPage);
+  const authLoading = useAuthStore((s) => s.authLoading);
+  const restoreSession = useAuthStore((s) => s.restoreSession);
+  const setPage = useAuthStore((s) => s.setPage);
 
   // Keep the page id in sync with the URL hash (deep links, back/forward).
   useEffect(() => {

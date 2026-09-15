@@ -1,9 +1,10 @@
+import { useDataStore } from "../../state/useDataStore";
 import { useOceanStore } from "../../state/useOceanStore";
 import { getDepthBand } from "../../lib/depthBands";
 import ControlTooltip from "../ControlTooltip";
 
 export default function DepthSlider() {
-  const meta = useOceanStore((s) => s.meta);
+  const meta = useDataStore((s) => s.meta);
   const depth = useOceanStore((s) => s.depth);
   const setDepth = useOceanStore((s) => s.setDepth);
 

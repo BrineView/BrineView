@@ -1,4 +1,4 @@
-import type { PageId } from "../state/useOceanStore";
+import type { PageId } from "../state/useAuthStore";
 
 const VALID_PAGES: PageId[] = ["landing", "login", "signup", "dashboard", "about"];
 

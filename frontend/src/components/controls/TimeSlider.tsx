@@ -1,9 +1,10 @@
+import { useDataStore } from "../../state/useDataStore";
 import { useOceanStore } from "../../state/useOceanStore";
 import { formatTime } from "../../lib/format";
 import ControlTooltip from "../ControlTooltip";
 
 export default function TimeSlider() {
-  const meta = useOceanStore((s) => s.meta);
+  const meta = useDataStore((s) => s.meta);
   const timeIndex = useOceanStore((s) => s.timeIndex);
   const setTimeIndex = useOceanStore((s) => s.setTimeIndex);
 

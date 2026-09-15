@@ -1,9 +1,9 @@
-import { useOceanStore } from "../state/useOceanStore";
+import { useAuthStore } from "../state/useAuthStore";
 import OceanBackground from "../components/OceanBackground";
 
 export default function AboutPage() {
-  const user = useOceanStore((s) => s.user);
-  const logout = useOceanStore((s) => s.logout);
+  const user = useAuthStore((s) => s.user);
+  const logout = useAuthStore((s) => s.logout);
 
   const features = [
     {

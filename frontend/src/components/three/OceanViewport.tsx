@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { OceanScene } from "./OceanScene";
+import { useDataStore } from "../../state/useDataStore";
 import { useOceanStore } from "../../state/useOceanStore";
 import { useDebouncedValue } from "../../hooks/useDebouncedValue";
 import LoadingOverlay from "../LoadingOverlay";
@@ -10,21 +11,21 @@ export default function OceanViewport() {
   const containerRef = useRef<HTMLDivElement>(null);
   const sceneRef = useRef<OceanScene | null>(null);
 
-  const field = useOceanStore((s) => s.field);
-  const fieldLoading = useOceanStore((s) => s.fieldLoading);
-  const fieldError = useOceanStore((s) => s.fieldError);
+  const field = useDataStore((s) => s.field);
+  const fieldLoading = useDataStore((s) => s.fieldLoading);
+  const fieldError = useDataStore((s) => s.fieldError);
   const colorscale = useOceanStore((s) => s.colorscale);
   const opacity = useOceanStore((s) => s.opacity);
   const showFloats = useOceanStore((s) => s.showFloats);
-  const selectedFloatId = useOceanStore((s) => s.selectedFloatId);
-  const floats = useOceanStore((s) => s.floats);
-  const bathymetry = useOceanStore((s) => s.bathymetry);
+  const selectedFloatId = useDataStore((s) => s.selectedFloatId);
+  const floats = useDataStore((s) => s.floats);
+  const bathymetry = useDataStore((s) => s.bathymetry);
   const variable = useOceanStore((s) => s.variable);
   const depth = useOceanStore((s) => s.depth);
   const timeIndex = useOceanStore((s) => s.timeIndex);
-  const loadField = useOceanStore((s) => s.loadField);
-  const selectFloat = useOceanStore((s) => s.selectFloat);
-  const loadFloatDetail = useOceanStore((s) => s.loadFloatDetail);
+  const loadField = useDataStore((s) => s.loadField);
+  const selectFloat = useDataStore((s) => s.selectFloat);
+  const loadFloatDetail = useDataStore((s) => s.loadFloatDetail);
 
   const [hoverInfo, setHoverInfo] = useState<{ lat: number; lon: number; value: number | null } | null>(null);
 

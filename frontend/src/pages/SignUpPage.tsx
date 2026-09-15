@@ -1,10 +1,10 @@
 import { useState } from "react";
-import { useOceanStore } from "../state/useOceanStore";
+import { useAuthStore } from "../state/useAuthStore";
 import OceanBackground from "../components/OceanBackground";
 import OAuthButtons from "../components/OAuthButtons";
 
 export default function SignUpPage() {
-  const signupWithEmail = useOceanStore((s) => s.signupWithEmail);
+  const signupWithEmail = useAuthStore((s) => s.signupWithEmail);
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");

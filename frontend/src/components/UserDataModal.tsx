@@ -1,19 +1,19 @@
 import { useEffect, useRef, useState, type ChangeEvent } from "react";
-import { useOceanStore } from "../state/useOceanStore";
+import { useUploadStore } from "../state/useUploadStore";
 import type { UserDatasetInfo, UserVariableInfo } from "../types/ocean";
 
 const UPLOAD_NC_ACCEPT = ".nc,.nc4,.cdf,.netcdf";
 const UPLOAD_CSV_ACCEPT = ".csv";
 
 export default function UserDataModal() {
-  const open = useOceanStore((s) => s.userDataOpen);
-  const close = useOceanStore((s) => s.closeUserData);
-  const datasets = useOceanStore((s) => s.userDatasets);
-  const loading = useOceanStore((s) => s.userDataLoading);
-  const error = useOceanStore((s) => s.userDataError);
-  const upload = useOceanStore((s) => s.uploadUserData);
-  const remove = useOceanStore((s) => s.deleteUserData);
-  const loadUserField = useOceanStore((s) => s.loadUserField);
+  const open = useUploadStore((s) => s.userDataOpen);
+  const close = useUploadStore((s) => s.closeUserData);
+  const datasets = useUploadStore((s) => s.userDatasets);
+  const loading = useUploadStore((s) => s.userDataLoading);
+  const error = useUploadStore((s) => s.userDataError);
+  const upload = useUploadStore((s) => s.uploadUserData);
+  const remove = useUploadStore((s) => s.deleteUserData);
+  const loadUserField = useUploadStore((s) => s.loadUserField);
 
   const ncInputRef = useRef<HTMLInputElement>(null);
   const csvInputRef = useRef<HTMLInputElement>(null);

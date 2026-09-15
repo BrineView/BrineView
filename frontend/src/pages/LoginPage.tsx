@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
-import { useOceanStore } from "../state/useOceanStore";
+import { useAuthStore } from "../state/useAuthStore";
 import { oauthErrorMessage } from "../lib/authErrors";
 import OceanBackground from "../components/OceanBackground";
 import OAuthButtons from "../components/OAuthButtons";
 
 export default function LoginPage() {
-  const loginWithEmail = useOceanStore((s) => s.loginWithEmail);
-  const handleOAuthToken = useOceanStore((s) => s.handleOAuthToken);
+  const loginWithEmail = useAuthStore((s) => s.loginWithEmail);
+  const handleOAuthToken = useAuthStore((s) => s.handleOAuthToken);
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");

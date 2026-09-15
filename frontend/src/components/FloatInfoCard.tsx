@@ -1,9 +1,10 @@
+import { useDataStore } from "../state/useDataStore";
 import { useOceanStore } from "../state/useOceanStore";
 import { formatNum } from "../lib/format";
 
 export default function FloatInfoCard() {
-  const selectedFloatId = useOceanStore((s) => s.selectedFloatId);
-  const floatDetail = useOceanStore((s) => s.floatDetail);
+  const selectedFloatId = useDataStore((s) => s.selectedFloatId);
+  const floatDetail = useDataStore((s) => s.floatDetail);
   const compareModel = useOceanStore((s) => s.compareModel);
 
   if (!selectedFloatId || !floatDetail) return null;

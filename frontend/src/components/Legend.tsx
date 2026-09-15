@@ -1,9 +1,10 @@
+import { useDataStore } from "../state/useDataStore";
 import { useOceanStore } from "../state/useOceanStore";
 import { buildGradientCss } from "../lib/colormaps";
 import { VARIABLE_MAP } from "../types/ocean";
 
 export default function Legend() {
-  const field = useOceanStore((s) => s.field);
+  const field = useDataStore((s) => s.field);
   const colorscale = useOceanStore((s) => s.colorscale);
   const variable = useOceanStore((s) => s.variable);
 

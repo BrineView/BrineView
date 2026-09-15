@@ -1,3 +1,4 @@
+import { useDataStore } from "../state/useDataStore";
 import { useOceanStore } from "../state/useOceanStore";
 import { Line } from "react-chartjs-2";
 import {
@@ -13,11 +14,11 @@ import {
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, ChartTooltip, ChartLegend);
 
 export default function DepthProfilePanel() {
-  const profilePanelOpen = useOceanStore((s) => s.profilePanelOpen);
-  const floatDetail = useOceanStore((s) => s.floatDetail);
-  const floatDetailLoading = useOceanStore((s) => s.floatDetailLoading);
+  const profilePanelOpen = useDataStore((s) => s.profilePanelOpen);
+  const floatDetail = useDataStore((s) => s.floatDetail);
+  const floatDetailLoading = useDataStore((s) => s.floatDetailLoading);
   const compareModel = useOceanStore((s) => s.compareModel);
-  const closeProfilePanel = useOceanStore((s) => s.closeProfilePanel);
+  const closeProfilePanel = useDataStore((s) => s.closeProfilePanel);
 
   if (!profilePanelOpen) return null;
 

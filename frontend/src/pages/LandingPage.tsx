@@ -1,8 +1,8 @@
-import { useOceanStore } from "../state/useOceanStore";
+import { useAuthStore } from "../state/useAuthStore";
 import OceanBackground from "../components/OceanBackground";
 
 export default function LandingPage() {
-  const user = useOceanStore((s) => s.user);
+  const user = useAuthStore((s) => s.user);
 
   return (
     <main id="main" className="relative flex flex-col h-screen w-screen overflow-hidden ocean-bg-animated">
