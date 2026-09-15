@@ -6,32 +6,36 @@ Browser-native 3D workspace for the Indian Ocean (Andaman Sea + Sumatra Trench) 
 
 ---
 
-## Run it 
-
-### Terminal 1 — Backend
+## Quick Start
 
 ```bash
-cd backend
-py -3.11 -m venv .venv && .venv\Scripts\activate
-pip install -r requirements.txt
-py -3.11 -m uvicorn app.main:app --reload       # API at http://localhost:8000
+./dev.sh
 ```
 
-> The bundled dataset (`bathymetry.nc`, `ocean_demo.nc`, `floats.json`) is already
-> committed, so the demo runs fully offline. To regenerate it from the live
-> GMRT / Argo sources (internet + ~2 min), run `python scripts/build_real_dataset.py`.
+That's it. Installs deps, starts both servers, and handles clean shutdown on Ctrl+C.
 
-> No Python 3.11? Any 3.11+ works (3.12/3.13/3.14 all tested on Windows).
+- **Frontend:** http://localhost:5173
+- **Backend:** http://localhost:8000
 
-### Terminal 2 — Frontend
+Or use `make dev` (same thing).
+
+### Manual startup (if you prefer two terminals)
 
 ```bash
+# Terminal 1 — Backend
+cd backend
+pip install -r requirements.txt
+python -m uvicorn app.main:app --reload       # API at http://localhost:8000
+
+# Terminal 2 — Frontend
 cd frontend
 npm install
 npm run dev                                     # app at http://localhost:5173
 ```
 
-That's it. The Vite dev server proxies `/api` → `localhost:8000`, so there is **no internet dependency** — everything runs on the committed local dataset (real GMRT bathymetry + real Argo positions + analytic fields).
+> The bundled dataset (`bathymetry.nc`, `ocean_demo.nc`, `floats.json`) is already
+> committed, so the demo runs fully offline. To regenerate it from the live
+> GMRT / Argo sources (internet + ~2 min), run `python scripts/build_real_dataset.py`.
 
 ---
 
@@ -77,9 +81,82 @@ Frontend (React + Three.js + Chart.js)  ──HTTP/JSON──▶  Backend (FastA
   · Depth-profile chart (model vs obs)
 ```
 
-- **Frontend:** React (Vite) + TypeScript, Three.js (OrbitControls, CanvasTexture surface, displaced GMRT seabed terrain, InstancedMarker-style raycasting), Chart.js (react-chartjs-2 depth-profile), Zustand.
+- **Frontend:** React (Vite) + TypeScript, Three.js (OrbitControls, CanvasTexture surface, displaced GMRT seabed terrain), Chart.js (react-chartjs-2 depth-profile), Zustand (4 domain stores).
 - **Backend:** FastAPI + Uvicorn, xarray + netCDF4, NaN-safe JSON serialization, dependency-injected adapter.
 - **Data:** real GMRT bathymetry (CC-BY 4.0, Andaman Sea + Sumatra Trench, ~1 km source meshed to 0.025°) with analytic 4D ocean fields masked to the real sea floor (lat −4–15°N, lon 92–106°E, 8 depths, 8 times) + real Argo float positions whose observed profiles come from the Ifremer GDAC where reachable.
+
+---
+
+## Testing
+
+```bash
+# Backend (30 tests)
+cd backend && python -m pytest tests/ -v
+
+# Frontend (lint + typecheck + build)
+cd frontend && npm run verify
+```
+
+---
+
+## Project layout
+
+```
+BrineView/
+  dev.sh                          # one-command startup (./dev.sh or make dev)
+  Makefile                        # make dev, make test, make clean
+  .env.sample                     # all env vars documented
+  .kiro/steering/                 # project standards + context
+
+  backend/
+    app/
+      main.py                     # FastAPI app + CORS
+      deps.py                     # adapter DI (one-line swap)
+      utils.py                    # shared sanitize() for NaN/Inf → None
+      adapters/
+        base.py                   # DataAdapter ABC
+        synthetic.py              # reads ocean_demo.nc + bathymetry.nc + floats.json
+      routes/
+        api.py                    # 6 ocean data endpoints
+        auth.py                   # signup/login/OAuth
+        upload.py                 # user data upload
+      auth/
+        config.py                 # env var config + startup validation
+        security.py               # JWT (HS256) + PBKDF2 hashing
+        storage.py                # JSON-file user persistence
+        deps.py                   # FastAPI auth dependencies
+    tests/                        # pytest suite (30 tests)
+      test_utils.py               # sanitize edge cases
+      test_auth.py                # JWT, passwords, OAuth state
+      test_routes.py              # all API + auth endpoints
+    data/                         # committed bundle (offline demo):
+                                  #   ocean_demo.nc  bathymetry.nc  floats.json
+
+  frontend/
+    src/
+      App.tsx                     # hash router + ErrorBoundary
+      state/
+        useAuthStore.ts           # auth + routing
+        useOceanStore.ts          # ocean controls (variable/depth/time/scale)
+        useDataStore.ts           # data cache (field/floats/bathymetry)
+        useUploadStore.ts         # user data uploads
+      api/
+        client.ts                 # typed fetch wrappers
+        auth.ts                   # auth API calls
+      components/
+        three/
+          OceanScene.ts           # orchestrator (310 lines, down from 874)
+          helpers.ts              # pure functions + constants
+          terrain.ts              # bathymetry mesh creation
+          environment.ts          # sky, sea, graticule, container
+          markers.ts              # float marker management
+          surface.ts              # field surface mesh
+        controls/                 # variable/depth/time/scale/opacity/toggles
+        ErrorBoundary.tsx         # React error boundary
+        ...                       # TopBar, Footer, Legend, Tooltip, etc.
+      pages/                      # Landing, Login, SignUp, Dashboard, About
+      lib/                        # colormaps, depth bands, formatting, router
+```
 
 ---
 
@@ -94,27 +171,3 @@ Frontend (React + Three.js + Chart.js)  ──HTTP/JSON──▶  Backend (FastA
 User validation is an early, small (n=7), mostly-student survey used to sanity-check feature priority — not a validated study, and not yet tested with an actual oceanographer or forecaster.
 
 Cut scope (future work): live NetCDF ingestion pipelines and INCOIS/Argo live feeds, OGC WMS/WCS servers, CF-convention validation tooling, real-time blending of successive Argo cycles, current arrow overlays from the live model, Cesium-level georeferencing.
-
----
-
-## Project layout
-
-```
-backend/
-  app/
-    main.py                 # FastAPI app + CORS
-    deps.py                 # adapter DI (one-line swap)
-    adapters/base.py        # DataAdapter ABC
-    adapters/synthetic.py   # reads ocean_demo.nc + bathymetry.nc + floats.json
-    routes/api.py           # the 6 endpoints
-  scripts/build_real_dataset.py   # one-time: GMRT bathy + Argo + fields → .nc + .json
-  data/                     # committed bundle (no internet needed to demo):
-                            #   ocean_demo.nc  bathymetry.nc  floats.json  users.json
-frontend/
-  src/
-    App.tsx                 # routing shell
-    state/useOceanStore.ts  # Zustand UI/data store
-    api/client.ts           # typed fetch wrappers
-    lib/                    # colormaps, depth bands, formatting
-    components/             # panels, controls, 3D scene, charts
-```
