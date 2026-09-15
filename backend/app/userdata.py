@@ -7,32 +7,18 @@ committed bundle or the main `DataAdapter` contract.
 import csv
 import io
 import tempfile
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Any
 
 import numpy as np
 import xarray as xr
 
+from .utils import sanitize
+
 MAX_UPLOAD_BYTES = 50 * 1024 * 1024
 
 LAT_COLUMNS = ("latitude", "lat", "Latitude", "Lat")
 LON_COLUMNS = ("longitude", "lon", "Longitude", "Lon")
-
-
-def _sanitize(arr: Any) -> Any:
-    """Replace NaN/Inf with None for safe JSON serialization."""
-    if isinstance(arr, np.ndarray):
-        return _sanitize(arr.tolist())
-    if isinstance(arr, list):
-        return [_sanitize(x) for x in arr]
-    if isinstance(arr, float) and (np.isnan(arr) or np.isinf(arr)):
-        return None
-    if isinstance(arr, (np.floating, np.integer)):
-        v = float(arr)
-        if np.isnan(v) or np.isinf(v):
-            return None
-        return v
-    return arr
 
 
 @dataclass
@@ -303,13 +289,13 @@ def field_for(index: int, variable: str, depth: float, time_index: int) -> dict[
         da = da.isel({extra: 0})
 
     da = da.transpose(lat_d, lon_d)
-    values = _sanitize(da.values)
+    values = sanitize(da.values)
     flat = [v for row in values for v in row if v is not None]
     vmin = min(flat) if flat else 0.0
     vmax = max(flat) if flat else 1.0
 
-    lat = _sanitize(np.asarray(da[lat_d].values).tolist())
-    lon = _sanitize(np.asarray(da[lon_d].values).tolist())
+    lat = sanitize(np.asarray(da[lat_d].values).tolist())
+    lon = sanitize(np.asarray(da[lon_d].values).tolist())
     depth_meta = entry.meta.get("depths", [])
     resolved_depth = float(depth) if depth_meta else 0.0
     time_meta = entry.meta.get("times", [])

@@ -35,16 +35,3 @@ def get_current_user(
             headers={"WWW-Authenticate": "Bearer"},
         )
     return user
-
-
-def get_optional_user(
-    authorization: str | None = Header(default=None),
-) -> dict | None:
-    """Return the user for a valid JWT, or None without raising."""
-    if not authorization:
-        return None
-    try:
-        payload = decode_token(_bearer_token(authorization))
-    except ValueError:
-        return None
-    return get_user_by_id(payload["sub"])

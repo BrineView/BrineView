@@ -28,6 +28,6 @@ app.include_router(upload_router)
 def root():
     return {
         "service": "BrineView API",
-        "version": "0.1.0",
+        "version": "0.2.0",
         "status": "running",
     }

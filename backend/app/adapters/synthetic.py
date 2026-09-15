@@ -6,28 +6,13 @@ from typing import Any
 import numpy as np
 import xarray as xr
 
+from ..utils import sanitize
 from .base import DataAdapter
 
 _BATHY_FILE = "bathymetry.nc"
 
 # Resolve data directory relative to this file
 _DATA_DIR = Path(__file__).resolve().parent.parent.parent / "data"
-
-
-def _sanitize(arr: Any) -> Any:
-    """Replace NaN/Inf with None for safe JSON serialization."""
-    if isinstance(arr, np.ndarray):
-        return _sanitize(arr.tolist())
-    if isinstance(arr, list):
-        return [_sanitize(x) for x in arr]
-    if isinstance(arr, float) and (np.isnan(arr) or np.isinf(arr)):
-        return None
-    if isinstance(arr, (np.floating, np.integer)):
-        v = float(arr)
-        if np.isnan(v) or np.isinf(v):
-            return None
-        return v
-    return arr
 
 
 class SyntheticAdapter(DataAdapter):
@@ -94,7 +79,7 @@ class SyntheticAdapter(DataAdapter):
 
         da = self._ds[variable].isel(time=time_index).sel(depth=depth, method="nearest")
         resolved_depth = float(da.depth.values)
-        values = _sanitize(da.values)
+        values = sanitize(da.values)
         flat_vals = [v for row in values for v in row if v is not None]
         vmin = min(flat_vals) if flat_vals else 0.0
         vmax = max(flat_vals) if flat_vals else 1.0
@@ -103,8 +88,8 @@ class SyntheticAdapter(DataAdapter):
             "variable": variable,
             "depth": resolved_depth,
             "time": self._times[time_index],
-            "lat": _sanitize(self._lats.tolist()),
-            "lon": _sanitize(self._lons.tolist()),
+            "lat": sanitize(self._lats.tolist()),
+            "lon": sanitize(self._lons.tolist()),
             "values": values,
             "min": vmin,
             "max": vmax,
@@ -132,14 +117,14 @@ class SyntheticAdapter(DataAdapter):
         bathy_on_field = da.sel(
             lat=self._lats, lon=self._lons, method="nearest"
         )
-        values = _sanitize(bathy_on_field.values)
+        values = sanitize(bathy_on_field.values)
         flat = [v for row in values for v in row if v is not None]
         zmin = min(flat) if flat else 0.0
         zmax = max(flat) if flat else 1.0
         return {
             "units": "m",
-            "lat": _sanitize(self._lats.tolist()),
-            "lon": _sanitize(self._lons.tolist()),
+            "lat": sanitize(self._lats.tolist()),
+            "lon": sanitize(self._lons.tolist()),
             "values": values,
             "min": zmin,
             "max": zmax,
@@ -164,8 +149,8 @@ class SyntheticAdapter(DataAdapter):
             ).values)
             model_profile.append({
                 "depth": int(d),
-                "temperature": round(_sanitize(t_val) or 0.0, 3),
-                "salinity": round(_sanitize(s_val) or 0.0, 3),
+                "temperature": round(sanitize(t_val) or 0.0, 3),
+                "salinity": round(sanitize(s_val) or 0.0, 3),
             })
 
         return {
