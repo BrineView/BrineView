@@ -1,9 +1,7 @@
 .PHONY: dev dev-backend dev-frontend install install-backend install-frontend clean test test-backend
 
-dev: install
-	cd frontend && npm run dev &
-	cd backend && python -m uvicorn app.main:app --reload --port 8000
-	wait
+dev:
+	./dev.sh
 
 dev-backend:
 	cd backend && python -m uvicorn app.main:app --reload --port 8000
