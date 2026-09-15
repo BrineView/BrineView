@@ -11,10 +11,20 @@ Browser-native 3D workspace for the Indian Ocean (Andaman Sea + Sumatra Trench) 
 ### Terminal 1 — Backend
 
 ```bash
-cd backend
-py -3.11 -m venv .venv && .venv\Scripts\activate
+## Windows
+cd Backend
+python -m venv .venv
+.\.venv\Scripts\activate
 pip install -r requirements.txt
-py -3.11 -m uvicorn app.main:app --reload       # API at http://localhost:8000
+uvicorn app.main:app --reload
+
+
+## Linux
+cd Backend
+python -m venv .venv
+.\.venv\Scripts\activate
+pip install -r requirements.txt
+uvicorn app.main:app --reload
 ```
 
 > The bundled dataset (`bathymetry.nc`, `ocean_demo.nc`, `floats.json`) is already
