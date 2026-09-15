@@ -12,6 +12,7 @@ Browser-native 3D workspace for the Indian Ocean (Andaman Sea + Sumatra Trench) 
 
 ```bash
 ## Windows
+cd BrineView
 cd Backend
 python -m venv .venv
 .\.venv\Scripts\activate
@@ -20,6 +21,7 @@ uvicorn app.main:app --reload
 
 
 ## Linux
+cd BrineView
 cd Backend
 python -m venv .venv
 .\.venv\Scripts\activate
@@ -36,6 +38,7 @@ uvicorn app.main:app --reload
 ### Terminal 2 — Frontend
 
 ```bash
+cd BrineView
 cd frontend
 npm install
 npm run dev                                     # app at http://localhost:5173
