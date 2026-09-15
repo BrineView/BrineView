@@ -2,6 +2,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from .deps import warm_adapter
 from .routes.api import router as api_router
 from .routes.auth import router as auth_router
 from .routes.upload import router as upload_router
@@ -22,6 +23,11 @@ app.add_middleware(
 app.include_router(api_router)
 app.include_router(auth_router)
 app.include_router(upload_router)
+
+
+@app.on_event("startup")
+def _startup():
+    warm_adapter()
 
 
 @app.get("/")
