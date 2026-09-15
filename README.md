@@ -19,6 +19,8 @@ That's it. Installs deps, starts both servers, and handles clean shutdown on Ctr
 
 Or use `make dev` (same thing).
 
+> **Windows:** Use `dev.sh` from Git Bash, WSL, or MSYS2. From PowerShell/CMD, use the manual commands below or install [Make for Windows](https://gnuwin32.sourceforge.net/packages/make.htm).
+
 ### Manual startup (if you prefer two terminals)
 
 ```bash
@@ -32,6 +34,8 @@ cd frontend
 npm install
 npm run dev                                     # app at http://localhost:5173
 ```
+
+> **Windows (PowerShell):** Replace `python` with `py -3.11` (or `py -3.12`/`py -3.13` if needed). The venv setup is optional — just `pip install -r requirements.txt` in the backend folder.
 
 > The bundled dataset (`bathymetry.nc`, `ocean_demo.nc`, `floats.json`) is already
 > committed, so the demo runs fully offline. To regenerate it from the live
