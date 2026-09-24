@@ -164,14 +164,3 @@ BrineView/
 
 ---
 
-## To the judges — what this MVP does and does NOT yet do (say this honestly)
-
-> "The sea floor is real GMRT bathymetry and the float positions are real Argo floats from the
-> Ifremer GDAC (with observed profiles where reachable). The ocean *fields* themselves are
-> analytic — built to the same (time, depth, lat, lon) NetCDF structure as real INCOIS model
-> output — and flow through a swappable `DataAdapter`, so the next step is plugging in the live
-> INCOIS model output without touching the frontend or API contract."
-
-User validation is an early, small (n=7), mostly-student survey used to sanity-check feature priority — not a validated study, and not yet tested with an actual oceanographer or forecaster.
-
-Cut scope (future work): live NetCDF ingestion pipelines and INCOIS/Argo live feeds, OGC WMS/WCS servers, CF-convention validation tooling, real-time blending of successive Argo cycles, current arrow overlays from the live model, Cesium-level georeferencing.
