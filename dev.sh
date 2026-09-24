@@ -4,8 +4,8 @@ set -e
 cleanup() {
   echo ""
   echo "Shutting down..."
-  kill $FRONTEND_PID $BACKEND_PID 2>/dev/null
-  wait $FRONTEND_PID $BACKEND_PID 2>/dev/null
+  kill $FRONTEND_PID $BACKEND_PID 2>/dev/null || true
+  wait $FRONTEND_PID $BACKEND_PID 2>/dev/null || true
   exit 0
 }
 
