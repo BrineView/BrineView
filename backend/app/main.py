@@ -30,7 +30,7 @@ def _startup():
     warm_adapter()
 
 
-@app.get("/")
+@app.api_route("/", methods=["GET", "HEAD"])
 def root():
     return {
         "service": "BrineView API",

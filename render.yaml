@@ -8,3 +8,5 @@ services:
     envVars:
       - key: BRINEVIEW_ADAPTER
         value: synthetic
+      - key: JWT_SECRET
+        generateValue: true
