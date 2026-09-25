@@ -1,4 +1,6 @@
 """BrineView FastAPI application."""
+import logging
+from contextlib import asynccontextmanager
 from pathlib import Path
 
 from fastapi import FastAPI
@@ -11,9 +13,29 @@ from .routes.api import router as api_router
 from .routes.auth import router as auth_router
 from .routes.upload import router as upload_router
 
+logger = logging.getLogger("brineview")
+
 FRONTEND_DIST = Path(__file__).resolve().parents[2] / "frontend" / "dist"
 
-app = FastAPI(title="BrineView API", version="0.2.0", description="Interactive 3D Ocean Data Visualization")
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Warm-up must never kill the function: on serverless (read-only FS,
+    # cold-start limits) a data problem should surface as a request-time
+    # error, not a dead deployment. get_adapter() retries lazily per request.
+    try:
+        warm_adapter()
+    except Exception:
+        logger.exception("Data adapter warm-up failed; endpoints will retry lazily")
+    yield
+
+
+app = FastAPI(
+    title="BrineView API",
+    version="0.2.0",
+    description="Interactive 3D Ocean Data Visualization",
+    lifespan=lifespan,
+)
 
 # CORS for local dev (belt-and-suspenders; Vite proxy handles it in practice)
 app.add_middleware(
@@ -29,11 +51,6 @@ app.add_middleware(
 app.include_router(api_router)
 app.include_router(auth_router)
 app.include_router(upload_router)
-
-
-@app.on_event("startup")
-def _startup():
-    warm_adapter()
 
 
 @app.api_route("/", methods=["GET", "HEAD"])

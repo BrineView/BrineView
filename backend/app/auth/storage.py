@@ -7,6 +7,7 @@ protected by a process-level lock and writes are atomic (temp file +
 """
 import json
 import os
+import tempfile
 import threading
 import uuid
 from datetime import datetime, timezone
@@ -16,6 +17,16 @@ USERS_FILE = (
     Path(__file__).resolve().parent.parent.parent / "data" / "users.json"
 )
 
+# Serverless filesystems (e.g. Vercel) are read-only except /tmp. Writes fall
+# back here so auth endpoints degrade to ephemeral storage instead of 500s.
+_FALLBACK_FILE = Path(tempfile.gettempdir()) / "brineview-users.json"
+
+
+def _candidates() -> tuple[Path, ...]:
+    if _FALLBACK_FILE == USERS_FILE:
+        return (USERS_FILE,)
+    return (USERS_FILE, _FALLBACK_FILE)
+
 _lock = threading.Lock()
 
 
@@ -24,22 +35,32 @@ def _now_iso() -> str:
 
 
 def _load() -> dict[str, dict]:
-    if not USERS_FILE.exists():
-        return {}
-    try:
-        with open(USERS_FILE, "r", encoding="utf-8") as fh:
-            data = json.load(fh)
-        return data if isinstance(data, dict) else {}
-    except (json.JSONDecodeError, OSError):
-        return {}
+    for path in _candidates():
+        if not path.exists():
+            continue
+        try:
+            with open(path, "r", encoding="utf-8") as fh:
+                data = json.load(fh)
+            return data if isinstance(data, dict) else {}
+        except (json.JSONDecodeError, OSError):
+            return {}
+    return {}
 
 
 def _save(data: dict[str, dict]) -> None:
-    USERS_FILE.parent.mkdir(parents=True, exist_ok=True)
-    tmp = USERS_FILE.with_suffix(".json.tmp")
-    with open(tmp, "w", encoding="utf-8") as fh:
-        json.dump(data, fh, indent=2, ensure_ascii=False)
-    os.replace(tmp, USERS_FILE)
+    last_error: OSError | None = None
+    for path in _candidates():
+        try:
+            path.parent.mkdir(parents=True, exist_ok=True)
+            tmp = path.with_suffix(".json.tmp")
+            with open(tmp, "w", encoding="utf-8") as fh:
+                json.dump(data, fh, indent=2, ensure_ascii=False)
+            os.replace(tmp, path)
+            return
+        except OSError as e:
+            last_error = e
+            continue
+    raise last_error or OSError("No writable location for user storage")
 
 
 def find_user_by_email(email: str) -> dict | None:

@@ -2,7 +2,12 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "functions": {
     "backend/app/main.py": {
-      "maxDuration": 60
+      "maxDuration": 60,
+      "memory": 1024
+    },
+    "api/index.py": {
+      "maxDuration": 60,
+      "memory": 1024
     }
   }
 }
