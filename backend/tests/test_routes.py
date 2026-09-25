@@ -51,6 +51,19 @@ class TestOceanAPI:
         r = client.get("/api/floats/nonexistent-id")
         assert r.status_code == 404
 
+    def test_health(self, client):
+        r = client.get("/api/health")
+        assert r.status_code == 200
+        assert r.json() == {"status": "ok", "version": "0.2.0"}
+
+    def test_diag(self, client):
+        r = client.get("/api/diag")
+        assert r.status_code == 200
+        data = r.json()
+        assert data["version"] == "0.2.0"
+        assert data["adapter"]["ok"] is True
+        assert all(data["data_files"].values())
+
 
 class TestAuthAPI:
     def test_signup_and_login(self, client):
