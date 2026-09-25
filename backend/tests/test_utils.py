@@ -39,3 +39,19 @@ def test_nested_arrays():
     arr = np.array([[1.0, float("nan")], [float("inf"), 3.0]])
     result = sanitize(arr)
     assert result == [[1.0, None], [None, 3.0]]
+
+
+def test_empty_adapter_env_falls_back_to_synthetic(monkeypatch):
+    """An empty BRINEVIEW_ADAPTER (e.g. an empty Vercel env var) must not kill the app."""
+    import importlib
+
+    import app.deps as deps
+
+    monkeypatch.setenv("BRINEVIEW_ADAPTER", "")
+    try:
+        reloaded = importlib.reload(deps)
+        assert reloaded.ADAPTER_NAME == "synthetic"
+        assert isinstance(reloaded.get_adapter(), reloaded.SyntheticAdapter)
+    finally:
+        monkeypatch.delenv("BRINEVIEW_ADAPTER", raising=False)
+        importlib.reload(deps)

@@ -8,7 +8,7 @@ from .adapters.synthetic import SyntheticAdapter
 
 logger = logging.getLogger("brineview.adapter")
 
-ADAPTER_NAME = os.environ.get("BRINEVIEW_ADAPTER", "synthetic")
+ADAPTER_NAME = (os.environ.get("BRINEVIEW_ADAPTER") or "synthetic").strip().lower() or "synthetic"
 
 
 @lru_cache(maxsize=1)
