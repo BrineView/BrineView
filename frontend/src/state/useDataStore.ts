@@ -1,9 +1,14 @@
 import { create } from "zustand";
 import type {
+  AssimilateRequest,
+  AssimilateResponse,
   BathymetryResponse,
   FieldResponse,
   FloatDetail,
   FloatMeta,
+  FloatMetricRow,
+  GliderDetail,
+  GliderMeta,
   MetaResponse,
 } from "../types/ocean";
 import * as api from "../api/client";
@@ -22,6 +27,19 @@ interface DataState {
   selectedFloatId: string | null;
   profilePanelOpen: boolean;
 
+  floatMetrics: FloatMetricRow[];
+  metricsLoading: boolean;
+
+  gliders: GliderMeta[];
+  glidersLoading: boolean;
+  gliderDetail: GliderDetail | null;
+  selectedGliderId: string | null;
+  gliderPanelOpen: boolean;
+
+  assimilated: AssimilateResponse | null;
+  assimilating: boolean;
+  assimError: string | null;
+
   loadMeta: () => Promise<void>;
   loadFloats: () => Promise<void>;
   loadBathymetry: () => Promise<void>;
@@ -29,6 +47,15 @@ interface DataState {
   loadFloatDetail: (id: string) => Promise<void>;
   selectFloat: (id: string | null) => void;
   closeProfilePanel: () => void;
+
+  loadFloatMetrics: () => Promise<void>;
+  loadGliders: () => Promise<void>;
+  loadGliderDetail: (id: string) => Promise<void>;
+  selectGlider: (id: string | null) => void;
+  closeGliderPanel: () => void;
+
+  runAssimilate: (req: AssimilateRequest) => Promise<boolean>;
+  clearAssimilated: () => void;
 }
 
 export const useDataStore = create<DataState>((set) => ({
@@ -42,6 +69,19 @@ export const useDataStore = create<DataState>((set) => ({
   floatDetailLoading: false,
   selectedFloatId: null,
   profilePanelOpen: false,
+
+  floatMetrics: [],
+  metricsLoading: false,
+
+  gliders: [],
+  glidersLoading: false,
+  gliderDetail: null,
+  selectedGliderId: null,
+  gliderPanelOpen: false,
+
+  assimilated: null,
+  assimilating: false,
+  assimError: null,
 
   loadMeta: async () => {
     try {
@@ -107,4 +147,59 @@ export const useDataStore = create<DataState>((set) => ({
       selectedFloatId: null,
       floatDetail: null,
     }),
+
+  loadFloatMetrics: async () => {
+    set({ metricsLoading: true });
+    try {
+      const floatMetrics = await api.getFloatMetrics();
+      set({ floatMetrics, metricsLoading: false });
+    } catch {
+      set({ metricsLoading: false });
+    }
+  },
+
+  loadGliders: async () => {
+    set({ glidersLoading: true });
+    try {
+      const gliders = await api.getGliders();
+      set({ gliders, glidersLoading: false });
+    } catch {
+      set({ glidersLoading: false });
+    }
+  },
+
+  loadGliderDetail: async (id) => {
+    try {
+      const gliderDetail = await api.getGliderDetail(id);
+      set({ gliderDetail });
+    } catch {
+      set({ gliderDetail: null });
+    }
+  },
+
+  selectGlider: (id) => set({ selectedGliderId: id, gliderPanelOpen: id !== null }),
+
+  closeGliderPanel: () =>
+    set({
+      gliderPanelOpen: false,
+      selectedGliderId: null,
+      gliderDetail: null,
+    }),
+
+  runAssimilate: async (req) => {
+    set({ assimilating: true, assimError: null });
+    try {
+      const assimilated = await api.postAssimilate(req);
+      set({ assimilated, assimilating: false });
+      return true;
+    } catch (err) {
+      set({
+        assimError: err instanceof Error ? err.message : "Assimilation failed",
+        assimilating: false,
+      });
+      return false;
+    }
+  },
+
+  clearAssimilated: () => set({ assimilated: null, assimError: null }),
 }));

@@ -1,0 +1,1232 @@
+[
+  {
+    "id": "GLIDER-01",
+    "name": "SeaExplorer SG-01",
+    "max_depth": 1000,
+    "track": [
+      {
+        "t": 0,
+        "lat": 4.8,
+        "lon": 95.5
+      },
+      {
+        "t": 1,
+        "lat": 5.66,
+        "lon": 95.1611
+      },
+      {
+        "t": 2,
+        "lat": 5.8724,
+        "lon": 94.3997
+      },
+      {
+        "t": 3,
+        "lat": 5.2773,
+        "lon": 93.7891
+      },
+      {
+        "t": 4,
+        "lat": 4.3227,
+        "lon": 93.7891
+      },
+      {
+        "t": 5,
+        "lat": 3.7276,
+        "lon": 94.3997
+      },
+      {
+        "t": 6,
+        "lat": 3.94,
+        "lon": 95.1611
+      },
+      {
+        "t": 7,
+        "lat": 4.8,
+        "lon": 95.5
+      }
+    ],
+    "stations": [
+      {
+        "t": 1,
+        "lat": 5.66,
+        "lon": 95.1611,
+        "profile": [
+          {
+            "depth": 0,
+            "temperature": 31.392,
+            "salinity": 35.135
+          },
+          {
+            "depth": 10,
+            "temperature": 29.949,
+            "salinity": 35.091
+          }
+        ]
+      },
+      {
+        "t": 3,
+        "lat": 5.2773,
+        "lon": 93.7891,
+        "profile": [
+          {
+            "depth": 0,
+            "temperature": 31.71,
+            "salinity": 35.286
+          },
+          {
+            "depth": 10,
+            "temperature": 29.809,
+            "salinity": 35.271
+          },
+          {
+            "depth": 25,
+            "temperature": 27.684,
+            "salinity": 35.255
+          },
+          {
+            "depth": 50,
+            "temperature": 24.477,
+            "salinity": 35.278
+          },
+          {
+            "depth": 100,
+            "temperature": 19.183,
+            "salinity": 35.183
+          },
+          {
+            "depth": 200,
+            "temperature": 14.615,
+            "salinity": 35.179
+          },
+          {
+            "depth": 500,
+            "temperature": 11.959,
+            "salinity": 35.09
+          },
+          {
+            "depth": 1000,
+            "temperature": 9.85,
+            "salinity": 35.149
+          }
+        ]
+      },
+      {
+        "t": 5,
+        "lat": 3.7276,
+        "lon": 94.3997,
+        "profile": [
+          {
+            "depth": 0,
+            "temperature": 31.213,
+            "salinity": 35.316
+          },
+          {
+            "depth": 10,
+            "temperature": 29.919,
+            "salinity": 35.336
+          },
+          {
+            "depth": 25,
+            "temperature": 27.257,
+            "salinity": 35.393
+          },
+          {
+            "depth": 50,
+            "temperature": 23.915,
+            "salinity": 35.29
+          },
+          {
+            "depth": 100,
+            "temperature": 18.617,
+            "salinity": 35.288
+          },
+          {
+            "depth": 200,
+            "temperature": 14.309,
+            "salinity": 35.242
+          },
+          {
+            "depth": 500,
+            "temperature": 11.372,
+            "salinity": 35.216
+          },
+          {
+            "depth": 1000,
+            "temperature": 9.111,
+            "salinity": 35.181
+          }
+        ]
+      },
+      {
+        "t": 7,
+        "lat": 4.8,
+        "lon": 95.5,
+        "profile": [
+          {
+            "depth": 0,
+            "temperature": 31.003,
+            "salinity": 35.162
+          },
+          {
+            "depth": 10,
+            "temperature": 29.572,
+            "salinity": 35.229
+          },
+          {
+            "depth": 25,
+            "temperature": 27.264,
+            "salinity": 35.132
+          },
+          {
+            "depth": 50,
+            "temperature": 23.558,
+            "salinity": 35.151
+          },
+          {
+            "depth": 100,
+            "temperature": 18.461,
+            "salinity": 35.06
+          },
+          {
+            "depth": 200,
+            "temperature": 14.155,
+            "salinity": 35.076
+          },
+          {
+            "depth": 500,
+            "temperature": 11.759,
+            "salinity": 35.019
+          },
+          {
+            "depth": 1000,
+            "temperature": 9.292,
+            "salinity": 34.985
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "GLIDER-02",
+    "name": "SeaExplorer SG-02",
+    "max_depth": 1000,
+    "track": [
+      {
+        "t": 0,
+        "lat": 2.4672,
+        "lon": 95.521
+      },
+      {
+        "t": 1,
+        "lat": 2.3289,
+        "lon": 94.4961
+      },
+      {
+        "t": 2,
+        "lat": 1.6417,
+        "lon": 94.0013
+      },
+      {
+        "t": 3,
+        "lat": 0.9231,
+        "lon": 94.4091
+      },
+      {
+        "t": 4,
+        "lat": 0.7142,
+        "lon": 95.4125
+      },
+      {
+        "t": 5,
+        "lat": 1.1723,
+        "lon": 96.2559
+      },
+      {
+        "t": 6,
+        "lat": 1.9525,
+        "lon": 96.3041
+      },
+      {
+        "t": 7,
+        "lat": 2.4672,
+        "lon": 95.521
+      }
+    ],
+    "stations": [
+      {
+        "t": 1,
+        "lat": 2.3289,
+        "lon": 94.4961,
+        "profile": [
+          {
+            "depth": 0,
+            "temperature": 30.882,
+            "salinity": 35.387
+          },
+          {
+            "depth": 10,
+            "temperature": 29.319,
+            "salinity": 35.405
+          },
+          {
+            "depth": 25,
+            "temperature": 27.133,
+            "salinity": 35.372
+          },
+          {
+            "depth": 50,
+            "temperature": 23.586,
+            "salinity": 35.385
+          },
+          {
+            "depth": 100,
+            "temperature": 18.238,
+            "salinity": 35.307
+          },
+          {
+            "depth": 200,
+            "temperature": 13.837,
+            "salinity": 35.28
+          },
+          {
+            "depth": 500,
+            "temperature": 11.49,
+            "salinity": 35.239
+          },
+          {
+            "depth": 1000,
+            "temperature": 8.965,
+            "salinity": 35.291
+          }
+        ]
+      },
+      {
+        "t": 3,
+        "lat": 0.9231,
+        "lon": 94.4091,
+        "profile": [
+          {
+            "depth": 0,
+            "temperature": 30.686,
+            "salinity": 35.487
+          },
+          {
+            "depth": 10,
+            "temperature": 29.035,
+            "salinity": 35.43
+          },
+          {
+            "depth": 25,
+            "temperature": 26.826,
+            "salinity": 35.487
+          },
+          {
+            "depth": 50,
+            "temperature": 23.154,
+            "salinity": 35.438
+          },
+          {
+            "depth": 100,
+            "temperature": 17.919,
+            "salinity": 35.447
+          },
+          {
+            "depth": 200,
+            "temperature": 13.492,
+            "salinity": 35.408
+          },
+          {
+            "depth": 500,
+            "temperature": 10.844,
+            "salinity": 35.283
+          },
+          {
+            "depth": 1000,
+            "temperature": 8.828,
+            "salinity": 35.245
+          }
+        ]
+      },
+      {
+        "t": 5,
+        "lat": 1.1723,
+        "lon": 96.2559,
+        "profile": [
+          {
+            "depth": 0,
+            "temperature": 29.971,
+            "salinity": 35.256
+          },
+          {
+            "depth": 10,
+            "temperature": 28.466,
+            "salinity": 35.166
+          },
+          {
+            "depth": 25,
+            "temperature": 26.183,
+            "salinity": 35.208
+          },
+          {
+            "depth": 50,
+            "temperature": 22.578,
+            "salinity": 35.142
+          },
+          {
+            "depth": 100,
+            "temperature": 17.323,
+            "salinity": 35.093
+          },
+          {
+            "depth": 200,
+            "temperature": 12.836,
+            "salinity": 35.076
+          },
+          {
+            "depth": 500,
+            "temperature": 10.338,
+            "salinity": 35.006
+          }
+        ]
+      },
+      {
+        "t": 7,
+        "lat": 2.4672,
+        "lon": 95.521,
+        "profile": [
+          {
+            "depth": 0,
+            "temperature": 30.724,
+            "salinity": 35.275
+          },
+          {
+            "depth": 10,
+            "temperature": 29.24,
+            "salinity": 35.338
+          },
+          {
+            "depth": 25,
+            "temperature": 26.834,
+            "salinity": 35.256
+          },
+          {
+            "depth": 50,
+            "temperature": 23.381,
+            "salinity": 35.254
+          },
+          {
+            "depth": 100,
+            "temperature": 18.133,
+            "salinity": 35.223
+          },
+          {
+            "depth": 200,
+            "temperature": 13.606,
+            "salinity": 35.16
+          },
+          {
+            "depth": 500,
+            "temperature": 10.953,
+            "salinity": 35.127
+          },
+          {
+            "depth": 1000,
+            "temperature": 8.562,
+            "salinity": 35.086
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "GLIDER-03",
+    "name": "Slocum G2 SG-03",
+    "max_depth": 1000,
+    "track": [
+      {
+        "t": 0,
+        "lat": 9.0124,
+        "lon": 93.5002
+      },
+      {
+        "t": 1,
+        "lat": 8.3212,
+        "lon": 93.4439
+      },
+      {
+        "t": 2,
+        "lat": 7.8399,
+        "lon": 93.8817
+      },
+      {
+        "t": 3,
+        "lat": 7.931,
+        "lon": 94.4839
+      },
+      {
+        "t": 4,
+        "lat": 8.5259,
+        "lon": 94.797
+      },
+      {
+        "t": 5,
+        "lat": 9.1766,
+        "lon": 94.5853
+      },
+      {
+        "t": 6,
+        "lat": 9.3931,
+        "lon": 94.0081
+      },
+      {
+        "t": 7,
+        "lat": 9.0124,
+        "lon": 93.5002
+      }
+    ],
+    "stations": [
+      {
+        "t": 1,
+        "lat": 8.3212,
+        "lon": 93.4439,
+        "profile": [
+          {
+            "depth": 0,
+            "temperature": 31.903,
+            "salinity": 34.964
+          },
+          {
+            "depth": 10,
+            "temperature": 30.426,
+            "salinity": 34.981
+          },
+          {
+            "depth": 25,
+            "temperature": 28.25,
+            "salinity": 34.971
+          },
+          {
+            "depth": 50,
+            "temperature": 24.72,
+            "salinity": 34.952
+          },
+          {
+            "depth": 100,
+            "temperature": 19.409,
+            "salinity": 34.88
+          },
+          {
+            "depth": 200,
+            "temperature": 14.906,
+            "salinity": 34.877
+          },
+          {
+            "depth": 500,
+            "temperature": 12.514,
+            "salinity": 34.773
+          },
+          {
+            "depth": 1000,
+            "temperature": 10.078,
+            "salinity": 34.771
+          }
+        ]
+      },
+      {
+        "t": 3,
+        "lat": 7.931,
+        "lon": 94.4839,
+        "profile": [
+          {
+            "depth": 0,
+            "temperature": 31.749,
+            "salinity": 34.978
+          },
+          {
+            "depth": 10,
+            "temperature": 30.071,
+            "salinity": 35.005
+          },
+          {
+            "depth": 25,
+            "temperature": 28.128,
+            "salinity": 34.982
+          },
+          {
+            "depth": 50,
+            "temperature": 24.419,
+            "salinity": 34.902
+          },
+          {
+            "depth": 100,
+            "temperature": 19.329,
+            "salinity": 34.959
+          },
+          {
+            "depth": 200,
+            "temperature": 14.818,
+            "salinity": 34.909
+          },
+          {
+            "depth": 500,
+            "temperature": 12.039,
+            "salinity": 34.805
+          },
+          {
+            "depth": 1000,
+            "temperature": 9.901,
+            "salinity": 34.814
+          }
+        ]
+      },
+      {
+        "t": 5,
+        "lat": 9.1766,
+        "lon": 94.5853,
+        "profile": [
+          {
+            "depth": 0,
+            "temperature": 31.755,
+            "salinity": 34.845
+          },
+          {
+            "depth": 10,
+            "temperature": 30.219,
+            "salinity": 34.857
+          },
+          {
+            "depth": 25,
+            "temperature": 27.722,
+            "salinity": 34.834
+          },
+          {
+            "depth": 50,
+            "temperature": 24.345,
+            "salinity": 34.888
+          },
+          {
+            "depth": 100,
+            "temperature": 19.226,
+            "salinity": 34.761
+          },
+          {
+            "depth": 200,
+            "temperature": 14.994,
+            "salinity": 34.766
+          },
+          {
+            "depth": 500,
+            "temperature": 12.07,
+            "salinity": 34.685
+          },
+          {
+            "depth": 1000,
+            "temperature": 9.974,
+            "salinity": 34.676
+          }
+        ]
+      },
+      {
+        "t": 7,
+        "lat": 9.0124,
+        "lon": 93.5002,
+        "profile": [
+          {
+            "depth": 0,
+            "temperature": 32.103,
+            "salinity": 34.872
+          },
+          {
+            "depth": 10,
+            "temperature": 30.778,
+            "salinity": 34.849
+          },
+          {
+            "depth": 25,
+            "temperature": 28.239,
+            "salinity": 34.828
+          },
+          {
+            "depth": 50,
+            "temperature": 24.703,
+            "salinity": 34.836
+          },
+          {
+            "depth": 100,
+            "temperature": 19.208,
+            "salinity": 34.833
+          },
+          {
+            "depth": 200,
+            "temperature": 15.03,
+            "salinity": 34.746
+          },
+          {
+            "depth": 500,
+            "temperature": 12.448,
+            "salinity": 34.684
+          },
+          {
+            "depth": 1000,
+            "temperature": 10.084,
+            "salinity": 34.716
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "GLIDER-04",
+    "name": "SeaGlider SG-04",
+    "max_depth": 500,
+    "track": [
+      {
+        "t": 0,
+        "lat": 3.351,
+        "lon": 97.1824
+      },
+      {
+        "t": 1,
+        "lat": 3.5997,
+        "lon": 96.7866
+      },
+      {
+        "t": 2,
+        "lat": 3.3216,
+        "lon": 96.4009
+      },
+      {
+        "t": 3,
+        "lat": 2.726,
+        "lon": 96.3157
+      },
+      {
+        "t": 4,
+        "lat": 2.2614,
+        "lon": 96.5952
+      },
+      {
+        "t": 5,
+        "lat": 2.2777,
+        "lon": 97.0289
+      },
+      {
+        "t": 6,
+        "lat": 2.7626,
+        "lon": 97.2903
+      },
+      {
+        "t": 7,
+        "lat": 3.351,
+        "lon": 97.1824
+      }
+    ],
+    "stations": [
+      {
+        "t": 1,
+        "lat": 3.5997,
+        "lon": 96.7866,
+        "profile": [
+          {
+            "depth": 0,
+            "temperature": 30.379,
+            "salinity": 35.123
+          },
+          {
+            "depth": 10,
+            "temperature": 28.824,
+            "salinity": 35.098
+          },
+          {
+            "depth": 25,
+            "temperature": 26.386,
+            "salinity": 35.053
+          },
+          {
+            "depth": 50,
+            "temperature": 23.121,
+            "salinity": 35.034
+          },
+          {
+            "depth": 100,
+            "temperature": 17.807,
+            "salinity": 34.955
+          },
+          {
+            "depth": 200,
+            "temperature": 13.627,
+            "salinity": 35.002
+          },
+          {
+            "depth": 500,
+            "temperature": 10.739,
+            "salinity": 34.843
+          }
+        ]
+      },
+      {
+        "t": 3,
+        "lat": 2.726,
+        "lon": 96.3157,
+        "profile": [
+          {
+            "depth": 0,
+            "temperature": 30.63,
+            "salinity": 35.134
+          },
+          {
+            "depth": 10,
+            "temperature": 28.709,
+            "salinity": 35.191
+          },
+          {
+            "depth": 25,
+            "temperature": 26.575,
+            "salinity": 35.16
+          },
+          {
+            "depth": 50,
+            "temperature": 23.02,
+            "salinity": 35.16
+          },
+          {
+            "depth": 100,
+            "temperature": 17.727,
+            "salinity": 35.116
+          },
+          {
+            "depth": 200,
+            "temperature": 13.238,
+            "salinity": 35.037
+          },
+          {
+            "depth": 500,
+            "temperature": 10.703,
+            "salinity": 34.962
+          }
+        ]
+      },
+      {
+        "t": 5,
+        "lat": 2.2777,
+        "lon": 97.0289,
+        "profile": [
+          {
+            "depth": 0,
+            "temperature": 29.799,
+            "salinity": 35.055
+          },
+          {
+            "depth": 10,
+            "temperature": 28.327,
+            "salinity": 35.098
+          },
+          {
+            "depth": 25,
+            "temperature": 25.948,
+            "salinity": 35.047
+          },
+          {
+            "depth": 50,
+            "temperature": 22.567,
+            "salinity": 35.009
+          },
+          {
+            "depth": 100,
+            "temperature": 17.397,
+            "salinity": 34.965
+          },
+          {
+            "depth": 200,
+            "temperature": 12.887,
+            "salinity": 34.928
+          }
+        ]
+      },
+      {
+        "t": 7,
+        "lat": 3.351,
+        "lon": 97.1824,
+        "profile": [
+          {
+            "depth": 0,
+            "temperature": 29.911,
+            "salinity": 35.071
+          },
+          {
+            "depth": 10,
+            "temperature": 28.421,
+            "salinity": 35.009
+          },
+          {
+            "depth": 25,
+            "temperature": 26.312,
+            "salinity": 35.033
+          },
+          {
+            "depth": 50,
+            "temperature": 23.02,
+            "salinity": 34.985
+          },
+          {
+            "depth": 100,
+            "temperature": 17.683,
+            "salinity": 34.921
+          },
+          {
+            "depth": 200,
+            "temperature": 12.857,
+            "salinity": 34.89
+          },
+          {
+            "depth": 500,
+            "temperature": 10.458,
+            "salinity": 34.827
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "GLIDER-05",
+    "name": "Slocum G2 SG-05",
+    "max_depth": 500,
+    "track": [
+      {
+        "t": 0,
+        "lat": 11.3678,
+        "lon": 96.306
+      },
+      {
+        "t": 1,
+        "lat": 11.0024,
+        "lon": 95.9352
+      },
+      {
+        "t": 2,
+        "lat": 10.4845,
+        "lon": 95.9896
+      },
+      {
+        "t": 3,
+        "lat": 10.2043,
+        "lon": 96.4284
+      },
+      {
+        "t": 4,
+        "lat": 10.3726,
+        "lon": 96.9211
+      },
+      {
+        "t": 5,
+        "lat": 10.8628,
+        "lon": 97.0967
+      },
+      {
+        "t": 6,
+        "lat": 11.3057,
+        "lon": 96.823
+      },
+      {
+        "t": 7,
+        "lat": 11.3678,
+        "lon": 96.306
+      }
+    ],
+    "stations": [
+      {
+        "t": 1,
+        "lat": 11.0024,
+        "lon": 95.9352,
+        "profile": [
+          {
+            "depth": 0,
+            "temperature": 31.421,
+            "salinity": 34.75
+          },
+          {
+            "depth": 10,
+            "temperature": 29.803,
+            "salinity": 34.761
+          },
+          {
+            "depth": 25,
+            "temperature": 27.403,
+            "salinity": 34.759
+          },
+          {
+            "depth": 50,
+            "temperature": 23.918,
+            "salinity": 34.712
+          },
+          {
+            "depth": 100,
+            "temperature": 18.758,
+            "salinity": 34.665
+          },
+          {
+            "depth": 200,
+            "temperature": 14.6,
+            "salinity": 34.599
+          },
+          {
+            "depth": 500,
+            "temperature": 11.861,
+            "salinity": 34.535
+          }
+        ]
+      },
+      {
+        "t": 3,
+        "lat": 10.2043,
+        "lon": 96.4284,
+        "profile": [
+          {
+            "depth": 0,
+            "temperature": 31.123,
+            "salinity": 34.821
+          },
+          {
+            "depth": 10,
+            "temperature": 29.689,
+            "salinity": 34.845
+          },
+          {
+            "depth": 25,
+            "temperature": 27.398,
+            "salinity": 34.786
+          },
+          {
+            "depth": 50,
+            "temperature": 23.8,
+            "salinity": 34.828
+          },
+          {
+            "depth": 100,
+            "temperature": 18.902,
+            "salinity": 34.711
+          },
+          {
+            "depth": 200,
+            "temperature": 14.034,
+            "salinity": 34.723
+          },
+          {
+            "depth": 500,
+            "temperature": 11.512,
+            "salinity": 34.593
+          }
+        ]
+      },
+      {
+        "t": 5,
+        "lat": 10.8628,
+        "lon": 97.0967,
+        "profile": [
+          {
+            "depth": 0,
+            "temperature": 30.931,
+            "salinity": 34.8
+          },
+          {
+            "depth": 10,
+            "temperature": 29.271,
+            "salinity": 34.844
+          },
+          {
+            "depth": 25,
+            "temperature": 27.089,
+            "salinity": 34.77
+          },
+          {
+            "depth": 50,
+            "temperature": 23.452,
+            "salinity": 34.8
+          },
+          {
+            "depth": 100,
+            "temperature": 18.23,
+            "salinity": 34.728
+          },
+          {
+            "depth": 200,
+            "temperature": 13.925,
+            "salinity": 34.692
+          },
+          {
+            "depth": 500,
+            "temperature": 11.341,
+            "salinity": 34.594
+          }
+        ]
+      },
+      {
+        "t": 7,
+        "lat": 11.3678,
+        "lon": 96.306,
+        "profile": [
+          {
+            "depth": 0,
+            "temperature": 31.387,
+            "salinity": 34.824
+          },
+          {
+            "depth": 10,
+            "temperature": 29.737,
+            "salinity": 34.73
+          },
+          {
+            "depth": 25,
+            "temperature": 27.323,
+            "salinity": 34.741
+          },
+          {
+            "depth": 50,
+            "temperature": 23.992,
+            "salinity": 34.733
+          },
+          {
+            "depth": 100,
+            "temperature": 18.577,
+            "salinity": 34.7
+          },
+          {
+            "depth": 200,
+            "temperature": 14.049,
+            "salinity": 34.618
+          },
+          {
+            "depth": 500,
+            "temperature": 11.641,
+            "salinity": 34.537
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "GLIDER-06",
+    "name": "SeaExplorer SG-06",
+    "max_depth": 1000,
+    "track": [
+      {
+        "t": 0,
+        "lat": 6.1211,
+        "lon": 97.81
+      },
+      {
+        "t": 1,
+        "lat": 5.7648,
+        "lon": 98.2061
+      },
+      {
+        "t": 2,
+        "lat": 5.7362,
+        "lon": 98.8988
+      },
+      {
+        "t": 3,
+        "lat": 6.0568,
+        "lon": 99.3665
+      },
+      {
+        "t": 4,
+        "lat": 6.4853,
+        "lon": 99.257
+      },
+      {
+        "t": 5,
+        "lat": 6.6989,
+        "lon": 98.6528
+      },
+      {
+        "t": 6,
+        "lat": 6.5368,
+        "lon": 98.0088
+      },
+      {
+        "t": 7,
+        "lat": 6.1211,
+        "lon": 97.81
+      }
+    ],
+    "stations": [
+      {
+        "t": 1,
+        "lat": 5.7648,
+        "lon": 98.2061,
+        "profile": [
+          {
+            "depth": 0,
+            "temperature": 30.312,
+            "salinity": 34.887
+          },
+          {
+            "depth": 10,
+            "temperature": 28.446,
+            "salinity": 34.896
+          },
+          {
+            "depth": 25,
+            "temperature": 26.255,
+            "salinity": 34.892
+          },
+          {
+            "depth": 50,
+            "temperature": 22.985,
+            "salinity": 34.803
+          }
+        ]
+      },
+      {
+        "t": 3,
+        "lat": 6.0568,
+        "lon": 99.3665,
+        "profile": [
+          {
+            "depth": 0,
+            "temperature": 30.112,
+            "salinity": 34.779
+          },
+          {
+            "depth": 10,
+            "temperature": 28.506,
+            "salinity": 34.783
+          },
+          {
+            "depth": 25,
+            "temperature": 26.019,
+            "salinity": 34.764
+          },
+          {
+            "depth": 50,
+            "temperature": 22.511,
+            "salinity": 34.768
+          }
+        ]
+      },
+      {
+        "t": 5,
+        "lat": 6.6989,
+        "lon": 98.6528,
+        "profile": [
+          {
+            "depth": 0,
+            "temperature": 30.191,
+            "salinity": 34.875
+          },
+          {
+            "depth": 10,
+            "temperature": 28.516,
+            "salinity": 34.843
+          },
+          {
+            "depth": 25,
+            "temperature": 26.284,
+            "salinity": 34.898
+          }
+        ]
+      }
+    ]
+  }
+]

@@ -10,75 +10,56 @@ import {
   Tooltip as ChartTooltip,
   Legend as ChartLegend,
 } from "chart.js";
+import type { ProfilePoint } from "../types/ocean";
+import { formatNum } from "../lib/format";
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, ChartTooltip, ChartLegend);
 
-export default function DepthProfilePanel() {
-  const profilePanelOpen = useDataStore((s) => s.profilePanelOpen);
-  const floatDetail = useDataStore((s) => s.floatDetail);
-  const floatDetailLoading = useDataStore((s) => s.floatDetailLoading);
-  const compareModel = useOceanStore((s) => s.compareModel);
-  const closeProfilePanel = useDataStore((s) => s.closeProfilePanel);
+type Datum = { depth: number; temperature: number; salinity: number } | ProfilePoint;
+interface Pair {
+  label: string;
+  depth: number;
+  temperature: number | null;
+  salinity: number | null;
+}
 
-  if (!profilePanelOpen) return null;
-
-  const depths = floatDetail?.profile?.map((p) => p.depth) ?? [];
-
+function buildSeries(
+  obs: Pair[],
+  model: Pair[],
+  compareModel: boolean,
+  salinity: boolean,
+  color: string,
+) {
+  const key = salinity ? "salinity" : "temperature";
   const datasets = [];
-  if (floatDetail?.profile) {
+  datasets.push({
+    label: salinity ? "Obs Salinity" : "Obs Temperature",
+    data: obs.map((p) => p[key]),
+    borderColor: color,
+    backgroundColor: color,
+    borderWidth: 2,
+    xAxisID: "x",
+    pointRadius: 3,
+    tension: 0.3,
+  });
+  if (compareModel) {
     datasets.push({
-      label: "Obs Temperature",
-      data: floatDetail.profile.map((p) => p.temperature),
-      borderColor: "#ef4444",
-      backgroundColor: "#ef4444",
-      borderWidth: 2,
-      pointRadius: 3,
-      tension: 0.3,
-      yAxisID: "y",
-    });
-    datasets.push({
-      label: "Obs Salinity",
-      data: floatDetail.profile.map((p) => p.salinity),
-      borderColor: "#3b82f6",
-      backgroundColor: "#3b82f6",
-      borderWidth: 2,
-      pointRadius: 3,
-      tension: 0.3,
-      yAxisID: "y1",
-    });
-  }
-
-  if (compareModel && floatDetail?.model_profile) {
-    datasets.push({
-      label: "Model Temperature",
-      data: floatDetail.model_profile.map((p) => p.temperature),
-      borderColor: "#ef4444",
-      backgroundColor: "#ef4444",
+      label: salinity ? "Model Salinity" : "Model Temperature",
+      data: model.map((p) => p[key]),
+      borderColor: color,
+      backgroundColor: color,
       borderWidth: 2,
       borderDash: [6, 4],
+      xAxisID: "x",
       pointRadius: 2,
       tension: 0.3,
-      yAxisID: "y",
-    });
-    datasets.push({
-      label: "Model Salinity",
-      data: floatDetail.model_profile.map((p) => p.salinity),
-      borderColor: "#3b82f6",
-      backgroundColor: "#3b82f6",
-      borderWidth: 2,
-      borderDash: [6, 4],
-      pointRadius: 2,
-      tension: 0.3,
-      yAxisID: "y1",
     });
   }
+  return datasets;
+}
 
-  const chartData = {
-    labels: depths.map((d) => `${d} m`),
-    datasets,
-  };
-
-  const chartOptions = {
+function makeOptions(unitLabel: string, color: string) {
+  return {
     responsive: true,
     maintainAspectRatio: false,
     indexAxis: "y" as const,
@@ -86,84 +67,147 @@ export default function DepthProfilePanel() {
       y: {
         reverse: true,
         title: { display: true, text: "Depth (m)", color: "#94a3b8" },
-        ticks: { color: "#94a3b8" },
+        ticks: { color: "#94a3b8", font: { size: 9 } },
         grid: { color: "#1e293b" },
+        position: "left" as const,
       },
       x: {
         position: "bottom" as const,
-        title: { display: true, text: "Temperature (°C)", color: "#ef4444" },
-        ticks: { color: "#ef4444" },
+        title: { display: true, text: unitLabel, color },
+        ticks: { color, font: { size: 9 } },
         grid: { color: "#1e293b" },
-      },
-      y1: {
-        position: "right" as const,
-        title: { display: true, text: "Salinity (PSU)", color: "#3b82f6" },
-        ticks: { color: "#3b82f6" },
-        grid: { drawOnChartArea: false },
       },
     },
     plugins: {
-      legend: {
-        labels: { color: "#94a3b8", font: { size: 10 } },
-      },
+      legend: { display: false },
     },
   };
+}
+
+function alignByDepth(profile: Datum[], model: Datum[]): Pair[] {
+  const modelByDepth = new Map<number, Datum>(model.map((p) => [p.depth, p]));
+  return profile.map((p) => ({
+    label: "x",
+    depth: p.depth,
+    temperature: modelByDepth.get(p.depth)?.temperature ?? null,
+    salinity: modelByDepth.get(p.depth)?.salinity ?? null,
+  }));
+}
+
+export default function DepthProfilePanel() {
+  const profilePanelOpen = useDataStore((s) => s.profilePanelOpen);
+  const gliderPanelOpen = useDataStore((s) => s.gliderPanelOpen);
+  const floatDetail = useDataStore((s) => s.floatDetail);
+  const gliderDetail = useDataStore((s) => s.gliderDetail);
+  const selectedGliderId = useDataStore((s) => s.selectedGliderId);
+  const floatDetailLoading = useDataStore((s) => s.floatDetailLoading);
+  const floatMetrics = useDataStore((s) => s.floatMetrics);
+  const compareModel = useOceanStore((s) => s.compareModel);
+  const timeIndex = useOceanStore((s) => s.timeIndex);
+  const closeProfilePanel = useDataStore((s) => s.closeProfilePanel);
+
+  if (!profilePanelOpen && !gliderPanelOpen) return null;
+  const isGlider = gliderPanelOpen;
+
+  let title = floatDetail?.id ?? "Float";
+  let profile: Datum[] = floatDetail?.profile ?? [];
+  let model: Datum[] = floatDetail?.model_profile ?? [];
+  let obsColorT = "#ef4444";
+  let obsColorS = "#3b82f6";
+  let metrics = floatDetail ? floatMetrics.find((m) => m.id === floatDetail.id) : undefined;
+
+  if (isGlider) {
+    title = gliderDetail?.name ?? selectedGliderId ?? "Glider";
+    const station =
+      gliderDetail?.stations.reduce((a, b) =>
+        Math.abs(a.t - timeIndex) <= Math.abs(b.t - timeIndex) ? a : b,
+      gliderDetail.stations[0],
+      ) ?? null;
+    profile = station?.profile ?? [];
+    model = station?.model_profile ?? [];
+    obsColorT = "#22d3ee";
+    obsColorS = "#a78bfa";
+    metrics = undefined;
+  }
+
+  const modelAligned = alignByDepth(profile, model);
+  const obsPairs: Pair[] = profile.map((p) => ({
+    label: "x",
+    depth: p.depth,
+    temperature: p.temperature,
+    salinity: p.salinity,
+  }));
+  const depths = profile.map((p) => p.depth);
+  const labels = depths.map((d) => `${d} m`);
+  const tempChart = {
+    labels,
+    datasets: buildSeries(obsPairs, modelAligned, compareModel, false, obsColorT),
+  };
+  const salChart = {
+    labels,
+    datasets: buildSeries(obsPairs, modelAligned, compareModel, true, obsColorS),
+  };
+  const tempOptions = makeOptions("Temperature (°C)", obsColorT);
+  const salOptions = makeOptions("Salinity (PSU)", obsColorS);
 
   return (
     <div
-      className="absolute right-0 top-0 bottom-0 flex flex-col border-l overflow-hidden"
-      style={{
-        width: 340,
-        background: "var(--panel-bg)",
-        borderColor: "var(--panel-border)",
-      }}
+      role="dialog"
+      aria-modal="true"
+      aria-label="Profile panel"
+      className="absolute top-4 right-4 z-20 w-[300px] rounded-lg border p-3 shadow-xl backdrop-blur-sm"
+      style={{ background: "rgba(10, 31, 61, 0.92)", borderColor: "var(--panel-border)" }}
     >
-      <div className="flex items-center justify-between px-3 py-2 border-b"
-        style={{ borderColor: "var(--panel-border)" }}>
-        <span className="font-data text-sm font-semibold" style={{ color: "var(--accent-orange)" }}>
-          {floatDetail?.id ?? "Profile"}
-        </span>
+      <div className="flex items-center justify-between gap-2 mb-2">
+        <div>
+          <div className="eyebrow">{isGlider ? "Glider Mission" : "Argo Float Profile"}</div>
+          <div className="font-semibold text-sm" style={{ color: "var(--text-primary)" }}>
+            {title}
+          </div>
+        </div>
         <button
           onClick={closeProfilePanel}
-          className="text-lg leading-none"
-          style={{ color: "var(--text-muted)", background: "none", border: "none", cursor: "pointer" }}
-          aria-label="Close depth profile"
+          aria-label="Close profile panel"
+          className="rounded px-2 py-1 text-sm"
+          style={{ color: "var(--text-muted)", cursor: "pointer", border: "none", background: "transparent" }}
         >
-          ×
+          ✕
         </button>
       </div>
 
-      <div className="flex-1 p-2 overflow-y-auto">
-        {floatDetailLoading && (
-          <div className="flex items-center justify-center h-full" style={{ color: "var(--text-muted)" }}>
-            Loading profile...
-          </div>
-        )}
+      {metrics && (
+        <div className="font-data text-[11px] rounded px-2 py-1 mb-2" style={{ background: "#12283a", color: "var(--text-primary)" }}>
+          RMSE {formatNum(metrics.rmse_t ?? 0, 3)} °C · bias {formatNum(metrics.bias_t ?? 0, 3)} °C&nbsp;
+          <span style={{ color: metrics.anomaly ? "#f87171" : "var(--text-muted)" }}>
+            {metrics.anomaly ? `· ANOMALY (score ${formatNum(metrics.anomaly_score, 2)})` : `· ${metrics.n_t} levels`}
+          </span>
+        </div>
+      )}
 
-        {!floatDetailLoading && floatDetail && (
-          <>
-            <div className="font-data text-xs mb-2" style={{ color: "var(--text-muted)" }}>
-              Lat: {floatDetail.lat.toFixed(2)}° · Lon: {floatDetail.lon.toFixed(2)}°
+      {floatDetailLoading ? (
+        <div className="text-xs" style={{ color: "var(--text-muted)" }}>Loading profile…</div>
+      ) : depths.length === 0 ? (
+        <div className="text-xs" style={{ color: "var(--text-muted)" }}>
+          {isGlider ? "Glider mission has no sampled station nearby." : "No observed profile at this location."}
+        </div>
+      ) : (
+        <div className="flex flex-col gap-3">
+          <div>
+            <div className="mb-1 text-[10px]" style={{ color: "var(--text-muted)" }}>
+              <span style={{ color: obsColorT }}>—</span> Obs ·{" "}
+              <span style={{ color: obsColorT }}>- -</span> Model
             </div>
-
-            {compareModel && (
-              <div className="font-data text-[10px] mb-2 p-1.5 rounded" style={{ background: "#16233a" }}>
-                <span style={{ color: "var(--text-muted)" }}>Solid = Observed | Dashed = Model</span>
-              </div>
-            )}
-
-            <div style={{ height: 400 }}>
-              <Line data={chartData} options={chartOptions} />
+            <div className="h-24">
+              <Line data={tempChart} options={tempOptions} />
             </div>
-          </>
-        )}
-
-        {!floatDetailLoading && !floatDetail && (
-          <div className="flex items-center justify-center h-full text-xs" style={{ color: "var(--text-muted)" }}>
-            Click a float marker to view its profile
           </div>
-        )}
-      </div>
+          <div>
+            <div className="h-24">
+              <Line data={salChart} options={salOptions} />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

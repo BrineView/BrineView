@@ -52,6 +52,14 @@ class SyntheticAdapter(DataAdapter):
                     self._bathy = None
 
         self._float_map: dict[str, dict] = {fl["id"]: fl for fl in self._floats}
+
+        gliders_file = _DATA_DIR / "gliders.json"
+        self._gliders: list[dict] = []
+        if gliders_file.exists():
+            with open(gliders_file, "r") as f:
+                self._gliders = json.load(f)
+        self._glider_map: dict[str, dict] = {g["id"]: g for g in self._gliders}
+
         self._depths: list[float] = self._ds.depth.values.tolist()
         self._lats: np.ndarray = self._ds.lat.values
         self._lons: np.ndarray = self._ds.lon.values
@@ -131,14 +139,23 @@ class SyntheticAdapter(DataAdapter):
         }
 
     def list_floats(self) -> list[dict[str, Any]]:
-        return [{"id": fl["id"], "lat": fl["lat"], "lon": fl["lon"]} for fl in self._floats]
+        return [
+            {
+                "id": fl["id"],
+                "lat": fl["lat"],
+                "lon": fl["lon"],
+                "trajectory": fl.get("trajectory", []),
+            }
+            for fl in self._floats
+        ]
 
     def get_float(self, float_id: str) -> dict[str, Any]:
         if float_id not in self._float_map:
             raise KeyError(f"Float not found: {float_id}")
 
         fl = self._float_map[float_id]
-        # Build model profile from the same dataset at the float's lat/lon
+        # Build model profile from the same dataset at the float's lat/lon.
+        # Seabed-masked cells come back as None (never a fabricated 0.0).
         model_profile = []
         for d in self._depths:
             t_val = float(self._ds["temperature"].isel(time=0).sel(
@@ -147,16 +164,78 @@ class SyntheticAdapter(DataAdapter):
             s_val = float(self._ds["salinity"].isel(time=0).sel(
                 lat=fl["lat"], lon=fl["lon"], depth=d, method="nearest"
             ).values)
+            t_sane = sanitize(t_val)
+            s_sane = sanitize(s_val)
             model_profile.append({
                 "depth": int(d),
-                "temperature": round(sanitize(t_val) or 0.0, 3),
-                "salinity": round(sanitize(s_val) or 0.0, 3),
+                "temperature": None if t_sane is None else round(t_sane, 3),
+                "salinity": None if s_sane is None else round(s_sane, 3),
             })
 
         return {
             "id": fl["id"],
             "lat": fl["lat"],
             "lon": fl["lon"],
+            "trajectory": fl.get("trajectory", []),
             "profile": fl["profile"],
             "model_profile": model_profile,
+        }
+
+    def list_gliders(self) -> list[dict[str, Any]]:
+        out = []
+        for g in self._gliders:
+            track = g.get("track", [])
+            head = track[0] if track else {}
+            out.append({
+                "id": g["id"],
+                "name": g.get("name", g["id"]),
+                "max_depth": g.get("max_depth"),
+                "lat": head.get("lat"),
+                "lon": head.get("lon"),
+                "track": track,
+            })
+        return out
+
+    def get_glider(self, glider_id: str) -> dict[str, Any]:
+        if glider_id not in self._glider_map:
+            raise KeyError(f"Glider not found: {glider_id}")
+
+        g = self._glider_map[glider_id]
+        track = g.get("track", [])
+        head = track[-1] if track else {}
+        stations = []
+        for st in g.get("stations", []):
+            obs = st.get("profile", [])
+            obs_by_depth = {p["depth"]: p for p in obs}
+            model_profile = []
+            for d in self._depths:
+                t_val = float(self._ds["temperature"].isel(time=0).sel(
+                    lat=st["lat"], lon=st["lon"], depth=d, method="nearest"
+                ).values)
+                s_val = float(self._ds["salinity"].isel(time=0).sel(
+                    lat=st["lat"], lon=st["lon"], depth=d, method="nearest"
+                ).values)
+                t_sane = sanitize(t_val)
+                s_sane = sanitize(s_val)
+                model_profile.append({
+                    "depth": int(d),
+                    "temperature": None if t_sane is None else round(t_sane, 3),
+                    "salinity": None if s_sane is None else round(s_sane, 3),
+                })
+            stations.append({
+                "t": st.get("t"),
+                "lat": st["lat"],
+                "lon": st["lon"],
+                "profile": obs,
+                "model_profile": model_profile,
+            })
+
+        return {
+            "id": g["id"],
+            "name": g.get("name", g["id"]),
+            "max_depth": g.get("max_depth"),
+            "track": track,
+            "lat": head.get("lat"),
+            "lon": head.get("lon"),
+            "stations": stations,
         }

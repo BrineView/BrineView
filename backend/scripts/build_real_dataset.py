@@ -360,7 +360,7 @@ def build_fields(seafloor: np.ndarray) -> xr.Dataset:
     # Mask out everything deeper than the real sea floor.
     for d, depth_m in enumerate(DEPTH_LEVELS):
         for it in range(n_t):
-            invalid = (sf < -(depth_m + 5.0)) | ~np.isfinite(sf)
+            invalid = (sf > -depth_m) | ~np.isfinite(sf)
             for arr in (temperature, salinity, u_current, v_current, chlorophyll):
                 arr[it, d][invalid] = np.nan
 

@@ -3,6 +3,7 @@ import { OceanScene } from "./OceanScene";
 import { useDataStore } from "../../state/useDataStore";
 import { useOceanStore } from "../../state/useOceanStore";
 import { useDebouncedValue } from "../../hooks/useDebouncedValue";
+import { toFieldResponse } from "../../types/ocean";
 import LoadingOverlay from "../LoadingOverlay";
 import ErrorBanner from "../ErrorBanner";
 import Tooltip from "../Tooltip";
@@ -17,8 +18,14 @@ export default function OceanViewport() {
   const colorscale = useOceanStore((s) => s.colorscale);
   const opacity = useOceanStore((s) => s.opacity);
   const showFloats = useOceanStore((s) => s.showFloats);
+  const showGliders = useOceanStore((s) => s.showGliders);
+  const showAnomalies = useOceanStore((s) => s.showAnomalies);
+  const showAssimilated = useOceanStore((s) => s.showAssimilated);
   const selectedFloatId = useDataStore((s) => s.selectedFloatId);
   const floats = useDataStore((s) => s.floats);
+  const gliders = useDataStore((s) => s.gliders);
+  const floatMetrics = useDataStore((s) => s.floatMetrics);
+  const assimilated = useDataStore((s) => s.assimilated);
   const bathymetry = useDataStore((s) => s.bathymetry);
   const variable = useOceanStore((s) => s.variable);
   const depth = useOceanStore((s) => s.depth);
@@ -26,6 +33,8 @@ export default function OceanViewport() {
   const loadField = useDataStore((s) => s.loadField);
   const selectFloat = useDataStore((s) => s.selectFloat);
   const loadFloatDetail = useDataStore((s) => s.loadFloatDetail);
+  const selectGlider = useDataStore((s) => s.selectGlider);
+  const loadGliderDetail = useDataStore((s) => s.loadGliderDetail);
 
   const [hoverInfo, setHoverInfo] = useState<{ lat: number; lon: number; value: number | null } | null>(null);
 
@@ -49,6 +58,10 @@ export default function OceanViewport() {
     scene.onFloatClick = (id) => {
       selectFloat(id);
       loadFloatDetail(id);
+    };
+    scene.onGliderClick = (id) => {
+      selectGlider(id);
+      loadGliderDetail(id);
     };
     scene.onHover = (info) => setHoverInfo(info);
 
@@ -90,6 +103,30 @@ export default function OceanViewport() {
     sceneRef.current?.setFloats(floats);
   }, [floats]);
 
+  // Update gliders
+  useEffect(() => {
+    sceneRef.current?.setGliders(gliders);
+  }, [gliders]);
+
+  // Animate float + glider positions along their tracks
+  useEffect(() => {
+    sceneRef.current?.setTimeIndex(timeIndex);
+  }, [timeIndex]);
+
+  // Anomaly highlighting (AI detector output)
+  useEffect(() => {
+    const ids = floatMetrics.filter((m) => m.anomaly).map((m) => m.id);
+    sceneRef.current?.setAnomalyIds(ids, showAnomalies);
+  }, [floatMetrics, showAnomalies]);
+
+  // Assimilation-corrected field overlay
+  useEffect(() => {
+    sceneRef.current?.setAssimilated(assimilated ? toFieldResponse(assimilated) : null, colorscale);
+  }, [assimilated, colorscale]);
+  useEffect(() => {
+    sceneRef.current?.setShowAssimilated(showAssimilated);
+  }, [showAssimilated]);
+
   // Update bathymetry terrain
   useEffect(() => {
     if (sceneRef.current && bathymetry) {
@@ -106,6 +143,9 @@ export default function OceanViewport() {
   useEffect(() => {
     sceneRef.current?.setShowFloats(showFloats);
   }, [showFloats]);
+  useEffect(() => {
+    sceneRef.current?.setShowGliders(showGliders);
+  }, [showGliders]);
 
   return (
     <div className="relative w-full h-full" ref={containerRef}>

@@ -1,8 +1,15 @@
 import type {
+  AnomaliesResponse,
+  AssimilateRequest,
+  AssimilateResponse,
   BathymetryResponse,
   FieldResponse,
   FloatDetail,
   FloatMeta,
+  FloatMetricDetail,
+  FloatMetricRow,
+  GliderDetail,
+  GliderMeta,
   MetaResponse,
   UserDatasetInfo,
 } from "../types/ocean";
@@ -76,6 +83,30 @@ export function getBathymetry(): Promise<BathymetryResponse> {
 
 export function getFloatDetail(id: string): Promise<FloatDetail> {
   return fetchJson<FloatDetail>(`${BASE}/floats/${encodeURIComponent(id)}`);
+}
+
+export function getFloatMetrics(): Promise<FloatMetricRow[]> {
+  return fetchJson<FloatMetricRow[]>(`${BASE}/floats/metrics`);
+}
+
+export function getAnomalies(): Promise<AnomaliesResponse> {
+  return fetchJson<AnomaliesResponse>(`${BASE}/floats/anomalies`);
+}
+
+export function getFloatMetricsById(id: string): Promise<FloatMetricDetail> {
+  return fetchJson<FloatMetricDetail>(`${BASE}/floats/${encodeURIComponent(id)}/metrics`);
+}
+
+export function postAssimilate(req: AssimilateRequest): Promise<AssimilateResponse> {
+  return postJson<AssimilateResponse>(`${BASE}/assimilate`, req);
+}
+
+export function getGliders(): Promise<GliderMeta[]> {
+  return fetchJson<GliderMeta[]>(`${BASE}/gliders`);
+}
+
+export function getGliderDetail(id: string): Promise<GliderDetail> {
+  return fetchJson<GliderDetail>(`${BASE}/gliders/${encodeURIComponent(id)}`);
 }
 
 export function listUserData(): Promise<UserDatasetInfo[]> {

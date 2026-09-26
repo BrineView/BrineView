@@ -1,15 +1,33 @@
 import { useOceanStore } from "../../state/useOceanStore";
 import ControlTooltip from "../ControlTooltip";
 
+type ToggleKey =
+  | "showFloats"
+  | "compareModel"
+  | "showGliders"
+  | "showAnomalies"
+  | "showAssimilated";
+
 interface ToggleProps {
   label: string;
-  storeKey: "showFloats" | "compareModel";
+  storeKey: ToggleKey;
   tip?: string;
 }
 
+type OceanStoreState = ReturnType<typeof useOceanStore.getState>;
+type BoolSetter = (b: boolean) => void;
+
+const SETTERS: Record<ToggleKey, keyof OceanStoreState> = {
+  showFloats: "setShowFloats",
+  compareModel: "setCompareModel",
+  showGliders: "setShowGliders",
+  showAnomalies: "setShowAnomalies",
+  showAssimilated: "setShowAssimilated",
+};
+
 export default function Toggle({ label, storeKey, tip }: ToggleProps) {
   const value = useOceanStore((s) => s[storeKey]);
-  const setter = useOceanStore((s) => s[storeKey === "showFloats" ? "setShowFloats" : "setCompareModel"]);
+  const setter = useOceanStore((s) => s[SETTERS[storeKey]] as unknown as BoolSetter);
 
   return (
     <ControlTooltip tip={tip ?? label}>

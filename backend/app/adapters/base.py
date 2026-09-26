@@ -43,3 +43,13 @@ class DataAdapter(ABC):
     def get_float(self, float_id: str) -> dict[str, Any]:
         """Return full float detail including observed and model profiles."""
         ...
+
+    @abstractmethod
+    def list_gliders(self) -> list[dict[str, Any]]:
+        """Return lightweight list of glider missions (id, name, track)."""
+        ...
+
+    @abstractmethod
+    def get_glider(self, glider_id: str) -> dict[str, Any]:
+        """Return full glider detail incl. CTD stations + model profiles."""
+        ...

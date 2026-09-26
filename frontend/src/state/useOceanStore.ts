@@ -8,6 +8,9 @@ interface OceanState {
   opacity: number;
   showFloats: boolean;
   compareModel: boolean;
+  showGliders: boolean;
+  showAnomalies: boolean;
+  showAssimilated: boolean;
 
   setVariable: (v: string) => void;
   setDepth: (d: number) => void;
@@ -16,6 +19,9 @@ interface OceanState {
   setOpacity: (o: number) => void;
   setShowFloats: (s: boolean) => void;
   setCompareModel: (c: boolean) => void;
+  setShowGliders: (s: boolean) => void;
+  setShowAnomalies: (s: boolean) => void;
+  setShowAssimilated: (s: boolean) => void;
 }
 
 export const useOceanStore = create<OceanState>((set, get) => ({
@@ -26,6 +32,9 @@ export const useOceanStore = create<OceanState>((set, get) => ({
   opacity: 1,
   showFloats: true,
   compareModel: true,
+  showGliders: true,
+  showAnomalies: false,
+  showAssimilated: false,
 
   setVariable: (v) => {
     const colorDefaults: Record<string, string> = {
@@ -43,4 +52,7 @@ export const useOceanStore = create<OceanState>((set, get) => ({
   setOpacity: (o) => set({ opacity: o }),
   setShowFloats: (s) => set({ showFloats: s }),
   setCompareModel: (c) => set({ compareModel: c }),
+  setShowGliders: (s) => set({ showGliders: s }),
+  setShowAnomalies: (s) => set({ showAnomalies: s }),
+  setShowAssimilated: (s) => set({ showAssimilated: s }),
 }));

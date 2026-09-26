@@ -25,10 +25,17 @@ export interface BathymetryResponse {
   max: number;
 }
 
+export interface TrajectoryPoint {
+  t: number;
+  lat: number;
+  lon: number;
+}
+
 export interface FloatMeta {
   id: string;
   lat: number;
   lon: number;
+  trajectory?: TrajectoryPoint[];
 }
 
 export interface ProfilePoint {
@@ -40,6 +47,118 @@ export interface ProfilePoint {
 export interface FloatDetail extends FloatMeta {
   profile: ProfilePoint[];
   model_profile: ProfilePoint[];
+}
+
+export interface MetricSummary {
+  rmse: number;
+  bias: number;
+  n: number;
+}
+
+export interface FloatMetricRow {
+  id: string;
+  lat: number;
+  lon: number;
+  rmse_t: number | null;
+  bias_t: number | null;
+  n_t: number;
+  rmse_s: number | null;
+  bias_s: number | null;
+  n_s: number;
+  anomaly_score: number;
+  anomaly: boolean;
+}
+
+export interface LevelDelta {
+  depth: number;
+  obs_t: number | null;
+  mod_t: number | null;
+  d_t: number | null;
+  obs_s: number | null;
+  mod_s: number | null;
+  d_s: number | null;
+}
+
+export interface FloatMetricDetail extends FloatMetricRow {
+  levels: LevelDelta[];
+}
+
+export interface AnomaliesResponse {
+  method: string;
+  threshold: number;
+  count: number;
+  anomalies: {
+    id: string;
+    lat: number;
+    lon: number;
+    anomaly_score: number;
+    rmse_t: number | null;
+    bias_t: number | null;
+    n_t: number;
+  }[];
+}
+
+export interface GliderMeta {
+  id: string;
+  name: string;
+  max_depth?: number;
+  lat: number;
+  lon: number;
+  track: TrajectoryPoint[];
+}
+
+export interface GliderStation {
+  t: number;
+  lat: number;
+  lon: number;
+  profile: ProfilePoint[];
+  model_profile: ProfilePoint[];
+}
+
+export interface GliderDetail extends GliderMeta {
+  stations: GliderStation[];
+}
+
+export interface AssimilateRequest {
+  variable: string;
+  depth: number;
+  time_index: number;
+  radius_cells?: number;
+}
+
+export interface AssimilateResponse {
+  variable: string;
+  depth: number;
+  time: string;
+  method: string;
+  radius_cells: number;
+  obs_level: number;
+  n_analysis: number;
+  n_validation: number;
+  before: MetricSummary;
+  after: MetricSummary;
+  validation_before: MetricSummary;
+  validation_after: MetricSummary;
+  reduction_rmse_pct: number | null;
+  reduction_bias_pct: number | null;
+  lat: number[];
+  lon: number[];
+  values: (number | null)[][];
+  min: number;
+  max: number;
+}
+
+export function toFieldResponse(resp: AssimilateResponse) {
+  return {
+    variable: resp.variable,
+    depth: resp.depth,
+    time: resp.time,
+    lat: resp.lat,
+    lon: resp.lon,
+    values: resp.values,
+    min: resp.min,
+    max: resp.max,
+  };
 }
 
 export interface VariableInfo {

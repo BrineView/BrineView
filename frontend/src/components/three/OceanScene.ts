@@ -1,10 +1,11 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
-import type { BathymetryResponse, FieldResponse, FloatMeta } from "../../types/ocean";
+import type { BathymetryResponse, FieldResponse, FloatMeta, GliderMeta } from "../../types/ocean";
 import { WORLD_X_SPAN, WORLD_Z_SPAN } from "./helpers";
 import { createTerrainMesh, disposeTerrain } from "./terrain";
 import { createEnvironment, type EnvironmentObjects } from "./environment";
 import { MarkerManager } from "./markers";
+import { GliderManager } from "./gliders";
 import { createSurfaceMesh, disposeSurface } from "./surface";
 
 export class OceanScene {
@@ -16,6 +17,9 @@ export class OceanScene {
   private terrainMesh: THREE.Mesh | null = null;
   private markerGroup: THREE.Group;
   private markerManager: MarkerManager;
+  private gliderGroup: THREE.Group;
+  private gliderManager: GliderManager;
+  private assimilatedMesh: THREE.Mesh | null = null;
 
   // Depth-layer stack (translucent planes below the surface)
   private oceanGroup: THREE.Group;
@@ -33,12 +37,17 @@ export class OceanScene {
   private currentColorscale = "thermal";
   private currentOpacity = 1;
   private showFloats = true;
+  private showGliders = true;
+  private showAssimilated = false;
+  private assimilatedField: FieldResponse | null = null;
+  private glidersCache: GliderMeta[] = [];
   private selectedFloatId: string | null = null;
   private latRange: [number, number] = [-4, 15];
   private lonRange: [number, number] = [92, 106];
 
   // Callbacks
   onFloatClick: ((id: string) => void) | null = null;
+  onGliderClick: ((id: string) => void) | null = null;
   onHover: ((info: { lat: number; lon: number; value: number | null } | null) => void) | null = null;
 
   // Drag detection for raycasting
@@ -90,6 +99,11 @@ export class OceanScene {
     this.markerGroup = new THREE.Group();
     this.oceanGroup.add(this.markerGroup);
     this.markerManager = new MarkerManager(this.markerGroup);
+
+    // Glider group + manager (drawn above the float layer)
+    this.gliderGroup = new THREE.Group();
+    this.oceanGroup.add(this.gliderGroup);
+    this.gliderManager = new GliderManager(this.gliderGroup);
 
     // Translucent depth layers below the surface
     this.createDepthLayers();
@@ -170,6 +184,7 @@ export class OceanScene {
     this.oceanGroup.add(this.surfaceMesh);
     this.setActiveDepth(this.currentDepth);
     this.env.rebuildGraticule(this.latRange, this.lonRange);
+    this.syncSurfaceVisibility();
   }
 
   setOpacity(opacity: number) {
@@ -194,6 +209,9 @@ export class OceanScene {
     }
     // Re-apply marker positions in case ranges changed
     this.markerManager.reposition(this.latRange, this.lonRange);
+    if (this.glidersCache.length > 0) {
+      this.gliderManager.setGliders(this.glidersCache, this.latRange, this.lonRange);
+    }
     this.env.rebuildGraticule(this.latRange, this.lonRange);
   }
 
@@ -201,14 +219,59 @@ export class OceanScene {
     this.markerManager.setFloats(floats, this.latRange, this.lonRange);
   }
 
+  setGliders(gliders: GliderMeta[]) {
+    this.glidersCache = gliders;
+    this.gliderManager.setGliders(gliders, this.latRange, this.lonRange);
+  }
+
   setSelectedFloatId(id: string | null) {
     this.selectedFloatId = id;
     this.markerManager.setSelectedId(id);
   }
 
+  setSelectedGliderId(id: string | null) {
+    this.gliderManager.setSelectedId(id);
+  }
+
+  setTimeIndex(t: number) {
+    this.markerManager.setTimeIndex(t);
+    this.gliderManager.setTimeIndex(t);
+  }
+
+  setAnomalyIds(ids: string[], active: boolean) {
+    this.markerManager.setAnomalies(ids, active);
+  }
+
   setShowFloats(show: boolean) {
     this.showFloats = show;
     this.markerManager.setVisible(show);
+  }
+
+  setShowGliders(show: boolean) {
+    this.showGliders = show;
+    this.gliderManager.setVisible(show);
+  }
+
+  setAssimilated(field: FieldResponse | null, colorscale: string) {
+    this.assimilatedField = field;
+    disposeSurface(this.assimilatedMesh);
+    this.assimilatedMesh = null;
+    if (field && field.lat.length > 1 && field.lon.length > 1) {
+      this.assimilatedMesh = createSurfaceMesh(field, colorscale, this.latRange, this.lonRange, this.currentOpacity);
+      this.oceanGroup.add(this.assimilatedMesh);
+    }
+    this.syncSurfaceVisibility();
+  }
+
+  setShowAssimilated(show: boolean) {
+    this.showAssimilated = show;
+    this.syncSurfaceVisibility();
+  }
+
+  private syncSurfaceVisibility() {
+    const overlayActive = this.showAssimilated && this.assimilatedMesh !== null;
+    if (this.surfaceMesh) this.surfaceMesh.visible = !overlayActive;
+    if (this.assimilatedMesh) this.assimilatedMesh.visible = overlayActive;
   }
 
   private handlePointerMove = (e: PointerEvent) => {
@@ -217,18 +280,23 @@ export class OceanScene {
     this.pointer.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
 
     if (this.surfaceMesh && this.currentField) {
-      this.raycaster.setFromCamera(this.pointer, this.camera);
-      const hits = this.raycaster.intersectObject(this.surfaceMesh);
-      if (hits.length > 0 && hits[0].uv) {
-        const uv = hits[0].uv;
-        const i = Math.round(uv.y * (this.currentField.lat.length - 1));
-        const j = Math.round(uv.x * (this.currentField.lon.length - 1));
-        if (i >= 0 && i < this.currentField.lat.length && j >= 0 && j < this.currentField.lon.length) {
-          const lat = this.currentField.lat[i];
-          const lon = this.currentField.lon[j];
-          const value = this.currentField.values[i]?.[j] ?? null;
-          this.onHover?.({ lat, lon, value });
-          return;
+      const overlayActive = this.showAssimilated && this.assimilatedMesh !== null;
+      const surface = overlayActive ? (this.assimilatedMesh as THREE.Mesh) : this.surfaceMesh;
+      const field = overlayActive ? (this.assimilatedField as FieldResponse) : this.currentField;
+      if (surface && field.lat.length > 1) {
+        this.raycaster.setFromCamera(this.pointer, this.camera);
+        const hits = this.raycaster.intersectObject(surface);
+        if (hits.length > 0 && hits[0].uv) {
+          const uv = hits[0].uv;
+          const i = Math.round(uv.y * (field.lat.length - 1));
+          const j = Math.round(uv.x * (field.lon.length - 1));
+          if (i >= 0 && i < field.lat.length && j >= 0 && j < field.lon.length) {
+            const lat = field.lat[i];
+            const lon = field.lon[j];
+            const value = field.values[i]?.[j] ?? null;
+            this.onHover?.({ lat, lon, value });
+            return;
+          }
         }
       }
     }
@@ -245,8 +313,6 @@ export class OceanScene {
     const dy = e.clientY - this.pointerDownPos.y;
     if (Math.sqrt(dx * dx + dy * dy) > 5) return;
 
-    if (!this.showFloats) return;
-
     const rect = this.renderer.domElement.getBoundingClientRect();
     const p = new THREE.Vector2(
       ((e.clientX - rect.left) / rect.width) * 2 - 1,
@@ -254,9 +320,18 @@ export class OceanScene {
     );
     this.raycaster.setFromCamera(p, this.camera);
 
-    const floatId = this.markerManager.raycast(this.raycaster);
-    if (floatId) {
-      this.onFloatClick?.(floatId);
+    if (this.showGliders) {
+      const gliderId = this.gliderManager.raycast(this.raycaster);
+      if (gliderId) {
+        this.onGliderClick?.(gliderId);
+        return;
+      }
+    }
+    if (this.showFloats) {
+      const floatId = this.markerManager.raycast(this.raycaster);
+      if (floatId) {
+        this.onFloatClick?.(floatId);
+      }
     }
   };
 
@@ -276,6 +351,7 @@ export class OceanScene {
     this.oceanGroup.rotation.z = Math.sin(t * 0.6) * 0.003;
 
     this.markerManager.updatePulse(performance.now() * 0.0012);
+    this.gliderManager.updatePulse(performance.now() * 0.0012);
 
     this.renderer.render(this.scene, this.camera);
   };
@@ -301,6 +377,9 @@ export class OceanScene {
     this.terrainMesh = null;
 
     this.markerManager.dispose();
+    this.gliderManager.dispose();
+    disposeSurface(this.assimilatedMesh);
+    this.assimilatedMesh = null;
 
     this.renderer.dispose();
     if (this.renderer.domElement.parentNode) {

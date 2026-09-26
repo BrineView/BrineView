@@ -11,6 +11,7 @@ from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
 from .deps import get_adapter, warm_adapter
+from .routes.analysis import router as analysis_router
 from .routes.api import router as api_router
 from .routes.auth import router as auth_router
 from .routes.upload import router as upload_router
@@ -34,7 +35,7 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(
     title="BrineView API",
-    version="0.2.0",
+    version="0.3.0",
     description="Interactive 3D Ocean Data Visualization",
     lifespan=lifespan,
 )
@@ -50,6 +51,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.include_router(analysis_router)
 app.include_router(api_router)
 app.include_router(auth_router)
 app.include_router(upload_router)
@@ -62,7 +64,7 @@ def root():
         return FileResponse(index)
     return {
         "service": "BrineView API",
-        "version": "0.2.0",
+        "version": "0.3.0",
         "status": "running",
     }
 
@@ -70,7 +72,7 @@ def root():
 @app.get("/api/health")
 def health() -> dict:
     """Liveness probe — no adapter, no static files, no disk I/O."""
-    return {"status": "ok", "version": "0.2.0"}
+    return {"status": "ok", "version": "0.3.0"}
 
 
 @app.get("/api/diag")
@@ -78,14 +80,14 @@ def diag() -> dict:
     """Self-diagnostics for serverless deployments. Never raises."""
     data_dir = Path(__file__).resolve().parents[1] / "data"
     info: dict = {
-        "version": "0.2.0",
+        "version": "0.3.0",
         "python": platform.python_version(),
         "cwd": os.getcwd(),
         "frontend_index": (FRONTEND_DIST / "index.html").is_file(),
         "frontend_assets": (FRONTEND_DIST / "assets").is_dir(),
         "data_files": {
             name: (data_dir / name).is_file()
-            for name in ("ocean_demo.nc", "bathymetry.nc", "floats.json")
+            for name in ("ocean_demo.nc", "bathymetry.nc", "floats.json", "gliders.json")
         },
     }
     try:

@@ -14,6 +14,8 @@ export default function DashboardPage() {
   const loadMeta = useDataStore((s) => s.loadMeta);
   const loadFloats = useDataStore((s) => s.loadFloats);
   const loadBathymetry = useDataStore((s) => s.loadBathymetry);
+  const loadFloatMetrics = useDataStore((s) => s.loadFloatMetrics);
+  const loadGliders = useDataStore((s) => s.loadGliders);
 
   useEffect(() => {
     // Auth guard — redirect unauthenticated visitors to the login screen
@@ -24,7 +26,9 @@ export default function DashboardPage() {
     loadMeta();
     loadFloats();
     loadBathymetry();
-  }, [user, setPage, loadMeta, loadFloats, loadBathymetry]);
+    loadFloatMetrics();
+    loadGliders();
+  }, [user, setPage, loadMeta, loadFloats, loadBathymetry, loadFloatMetrics, loadGliders]);
 
   // Avoid flashing dashboard content while redirecting
   if (!user) return null;

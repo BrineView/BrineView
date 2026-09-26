@@ -9,7 +9,7 @@ class TestOceanAPI:
         if "application/json" in r.headers.get("content-type", ""):
             data = r.json()
             assert data["service"] == "BrineView API"
-            assert data["version"] == "0.2.0"
+            assert data["version"] == "0.3.0"
         else:
             assert "BrineView" in r.text
 
@@ -54,13 +54,13 @@ class TestOceanAPI:
     def test_health(self, client):
         r = client.get("/api/health")
         assert r.status_code == 200
-        assert r.json() == {"status": "ok", "version": "0.2.0"}
+        assert r.json() == {"status": "ok", "version": "0.3.0"}
 
     def test_diag(self, client):
         r = client.get("/api/diag")
         assert r.status_code == 200
         data = r.json()
-        assert data["version"] == "0.2.0"
+        assert data["version"] == "0.3.0"
         assert data["adapter"]["ok"] is True
         assert all(data["data_files"].values())
 
